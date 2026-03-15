@@ -5,7 +5,7 @@ with an interactive table, summary cards, and charts.
 
 import csv
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 INPUT  = Path("dat/claims_dataset.csv")
@@ -25,7 +25,7 @@ def build_summary(claims):
                "23":"Emergency Room","31":"Skilled Nursing Facility"}
     pos_counts    = Counter(pos_map.get(c["box24b_place_of_service"], c["box24b_place_of_service"])
                             for c in claims)
-    cpt_counts    = Counter(c["box24d_cpt_code"]        for c in claims)
+    cpt_counts    = Counter((c["box24d_cpt_code"], c["box24d_cpt_description"]) for c in claims)
     diag_counts   = Counter(c["box21_diag1_icd10"]      for c in claims)
     state_counts  = Counter(c["box05_patient_state"]    for c in claims)
 
@@ -36,10 +36,89 @@ def build_summary(claims):
         "avg_charge":    total_billed / len(claims),
         "ins_counts":    dict(ins_counts.most_common()),
         "pos_counts":    dict(pos_counts.most_common()),
-        "cpt_counts":    dict(cpt_counts.most_common(10)),
+        "cpt_counts":    {f"{code} – {desc}": cnt for (code, desc), cnt in cpt_counts.most_common(10)},
         "diag_counts":   dict(diag_counts.most_common(10)),
         "state_counts":  dict(state_counts.most_common(10)),
+        "rel_hierarchy": build_hierarchy(claims),
     }
+
+
+def build_hierarchy(claims):
+    """Relationship → Insurance Type → [claim summaries]"""
+    tree = defaultdict(lambda: defaultdict(list))
+    for c in claims:
+        rel = c["box06_patient_relationship"]
+        ins = c["box01_insurance_type"]
+        tree[rel][ins].append({
+            "acct":    c["box26_patient_account_no"],
+            "patient": c["box02_patient_name"],
+            "dos":     c["box24a_dos_from"],
+            "cpt":     c["box24d_cpt_code"],
+            "desc":    c["box24d_cpt_description"],
+            "diag":    c["box21_diag1_icd10"],
+            "charge":  float(c["box28_total_charge"]),
+            "paid":    float(c["box29_amount_paid"]),
+        })
+    # Sort relationships: Self first, then alphabetical
+    order = ["Self", "Spouse", "Child", "Other"]
+    return {r: dict(tree[r]) for r in order if r in tree}
+
+
+def render_hierarchy(hierarchy):
+    html = ""
+    rel_colors = {"Self": "#1a3a5c", "Spouse": "#2e6da4", "Child": "#27a069", "Other": "#e05c2a"}
+    for rel, ins_groups in hierarchy.items():
+        total_claims = sum(len(v) for v in ins_groups.values())
+        total_billed = sum(c["charge"] for v in ins_groups.values() for c in v)
+        color = rel_colors.get(rel, "#555")
+        html += f"""
+  <div class="h-group">
+    <div class="h-rel" onclick="toggleNode(this)" style="border-left: 4px solid {color}">
+      <span class="h-arrow">▶</span>
+      <span class="h-label">{rel}</span>
+      <span class="h-meta">{total_claims} claims &nbsp;|&nbsp; ${total_billed:,.2f} billed</span>
+    </div>
+    <div class="h-children" style="display:none">"""
+
+        for ins, claim_list in ins_groups.items():
+            ins_billed = sum(c["charge"] for c in claim_list)
+            html += f"""
+      <div class="h-ins-group">
+        <div class="h-ins" onclick="toggleNode(this)">
+          <span class="h-arrow">▶</span>
+          <span class="h-label">{ins}</span>
+          <span class="h-meta">{len(claim_list)} claims &nbsp;|&nbsp; ${ins_billed:,.2f} billed</span>
+        </div>
+        <div class="h-children" style="display:none">
+          <table class="h-table">
+            <thead><tr>
+              <th>Account</th><th>Patient</th><th>DOS</th>
+              <th>CPT</th><th>Description</th><th>ICD-10</th>
+              <th>Billed</th><th>Paid</th>
+            </tr></thead>
+            <tbody>"""
+            for c in claim_list:
+                html += f"""
+              <tr>
+                <td>{c['acct']}</td>
+                <td>{c['patient']}</td>
+                <td>{c['dos']}</td>
+                <td><span class="badge">{c['cpt']}</span></td>
+                <td class="small">{c['desc']}</td>
+                <td><span class="badge diag">{c['diag']}</span></td>
+                <td class="amount">${c['charge']:,.2f}</td>
+                <td class="amount paid">${c['paid']:,.2f}</td>
+              </tr>"""
+            html += """
+            </tbody>
+          </table>
+        </div>
+      </div>"""
+
+        html += """
+    </div>
+  </div>"""
+    return html
 
 
 def render_html(claims, s):
@@ -127,6 +206,37 @@ def render_html(claims, s):
             border-radius: 4px; font-size: .78rem; font-weight: 600; }}
   .badge.diag {{ background: #fef3e2; color: #9a5000; }}
   .no-results {{ text-align: center; padding: 2rem; color: #888; }}
+
+  /* Hierarchy */
+  .hierarchy-wrap {{ margin: 0 2rem 2rem; background: #fff; border-radius: 8px;
+                     box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden; }}
+  .hierarchy-wrap .section-header {{ display: flex; align-items: center; justify-content: space-between;
+                                      padding: .8rem 1.2rem; border-bottom: 1px solid #eee; }}
+  .hierarchy-wrap .section-header h3 {{ font-size: .95rem; font-weight: 600; }}
+  .hierarchy-wrap .section-header button {{ font-size: .78rem; padding: .3rem .7rem; border: 1px solid #ddd;
+                                             border-radius: 5px; cursor: pointer; background: #f8f9fb; }}
+  .h-group {{ border-bottom: 1px solid #f0f0f0; }}
+  .h-rel {{ display: flex; align-items: center; gap: .6rem; padding: .7rem 1.2rem;
+            cursor: pointer; background: #f8f9fb; font-weight: 600; font-size: .88rem; }}
+  .h-rel:hover {{ background: #eef2fb; }}
+  .h-ins-group {{ margin-left: 2rem; border-left: 2px solid #e0e8f0; }}
+  .h-ins {{ display: flex; align-items: center; gap: .6rem; padding: .55rem 1rem;
+            cursor: pointer; font-size: .84rem; font-weight: 500; }}
+  .h-ins:hover {{ background: #f0f5fc; }}
+  .h-arrow {{ font-size: .65rem; color: #888; transition: transform .2s; min-width: 10px; }}
+  .h-arrow.open {{ transform: rotate(90deg); }}
+  .h-label {{ flex: 0 0 auto; }}
+  .h-meta {{ margin-left: auto; font-size: .78rem; color: #777; font-weight: 400; }}
+  .h-children {{ padding-left: .5rem; }}
+  .h-table {{ width: 100%; border-collapse: collapse; font-size: .8rem; margin: .4rem 0 .6rem 1rem; width: calc(100% - 1rem); }}
+  .h-table thead tr {{ background: #e8f0fb; }}
+  .h-table th {{ padding: .4rem .7rem; text-align: left; font-weight: 500; color: #1a3a5c; white-space: nowrap; }}
+  .h-table td {{ padding: .4rem .7rem; border-bottom: 1px solid #f4f4f4; white-space: nowrap; }}
+  .h-table tr:last-child td {{ border-bottom: none; }}
+  .h-table tr:hover td {{ background: #f5f8ff; }}
+  .h-table td.small {{ max-width: 200px; overflow: hidden; text-overflow: ellipsis; }}
+  .h-table td.amount {{ text-align: right; font-variant-numeric: tabular-nums; }}
+  .h-table td.paid {{ color: #1a7a4a; font-weight: 600; }}
 </style>
 </head>
 <body>
@@ -176,6 +286,17 @@ def render_html(claims, s):
     <h3>Top Diagnoses (ICD-10)</h3>
     <canvas id="diagChart"></canvas>
   </div>
+</div>
+
+<div class="hierarchy-wrap">
+  <div class="section-header">
+    <h3>Claims Hierarchy &mdash; by Relationship</h3>
+    <div style="display:flex;gap:.5rem">
+      <button onclick="expandAll()">Expand All</button>
+      <button onclick="collapseAll()">Collapse All</button>
+    </div>
+  </div>
+  {render_hierarchy(s['rel_hierarchy'])}
 </div>
 
 <div class="table-wrap">
@@ -230,8 +351,34 @@ function makeChart(id, type, labels, data, opts={{}}) {{
 
 makeChart('insChart',  'doughnut', {ins_labels},  {ins_data});
 makeChart('posChart',  'doughnut', {pos_labels},  {pos_data});
-makeChart('cptChart',  'bar',      {cpt_labels},  {cpt_data});
+new Chart(document.getElementById('cptChart'), {{
+  type: 'bar',
+  data: {{ labels: {cpt_labels}, datasets: [{{ data: {cpt_data},
+    backgroundColor: COLORS, borderWidth: 0 }}] }},
+  options: {{
+    indexAxis: 'y',
+    plugins: {{ legend: {{ display: false }} }},
+    scales: {{ x: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }} }}
+  }}
+}});
 makeChart('diagChart', 'bar',      {diag_labels}, {diag_data});
+
+// Hierarchy toggles
+function toggleNode(el) {{
+  const children = el.nextElementSibling;
+  const arrow    = el.querySelector('.h-arrow');
+  const open     = children.style.display !== 'none';
+  children.style.display = open ? 'none' : 'block';
+  arrow.classList.toggle('open', !open);
+}}
+function expandAll() {{
+  document.querySelectorAll('.h-children').forEach(el => el.style.display = 'block');
+  document.querySelectorAll('.h-arrow').forEach(el => el.classList.add('open'));
+}}
+function collapseAll() {{
+  document.querySelectorAll('.h-children').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.h-arrow').forEach(el => el.classList.remove('open'));
+}}
 
 // Search / filter
 document.getElementById('search').addEventListener('input', function() {{
