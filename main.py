@@ -1,14 +1,34 @@
 def fizzbuzz(n):
-    for i in range(1, n + 1):
-        if i % 15 == 0:
-            print("FizzBuzz")
-        elif i % 3 == 0:
-            print("Fizz")
-        elif i % 5 == 0:
-            print("Buzz")
-        else:
-            print(i)
+    if n % 15 == 0:
+        return "FizzBuzz"
+    elif n % 3 == 0:
+        return "Fizz"
+    elif n % 5 == 0:
+        return "Buzz"
+    else:
+        return str(n)
+
+
+def run_tui():
+    print("=" * 30)
+    print("      FizzBuzz TUI")
+    print("=" * 30)
+    print("Enter an integer to get its FizzBuzz result.")
+    print("Type 'quit' or 'q' to exit.\n")
+
+    while True:
+        user_input = input("Enter a number: ").strip()
+
+        if user_input.lower() in ("quit", "q"):
+            print("Goodbye!")
+            break
+
+        try:
+            n = int(user_input)
+            print(f"  => {fizzbuzz(n)}\n")
+        except ValueError:
+            print("  [!] Invalid input. Please enter a whole number.\n")
 
 
 if __name__ == "__main__":
-    fizzbuzz(100)
+    run_tui()
