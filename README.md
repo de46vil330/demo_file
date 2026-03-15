@@ -1,25 +1,27 @@
-# FizzBuzz
+# FizzBuzz & CMS-1500 Claims Dashboard
 
-A simple FizzBuzz application with an interactive TUI, written in Python.
+A FizzBuzz TUI application and CMS-1500 claims data generator with an interactive HTML dashboard, written in Python.
 
-## What it does
+---
 
-Prints the FizzBuzz result for any integer you enter, using these rules:
+## FizzBuzz TUI
 
-- **Fizz** — for multiples of 3
-- **Buzz** — for multiples of 5
-- **FizzBuzz** — for multiples of both 3 and 5
-- The number itself — for everything else
+### What it does
 
-## Usage
+Prints the FizzBuzz result for any integer you enter:
+
+- **Fizz** — multiples of 3
+- **Buzz** — multiples of 5
+- **FizzBuzz** — multiples of both 3 and 5
+- The number itself — everything else
+
+### Usage
 
 ```bash
 python main.py
 ```
 
-## Interactive TUI
-
-When you run the program, you'll see a prompt where you can enter any integer:
+### Example
 
 ```
 ==============================
@@ -34,15 +36,28 @@ Enter a number: 15
 Enter a number: 3
   => Fizz
 
-Enter a number: 5
-  => Buzz
-
-Enter a number: 7
-  => 7
-
 Enter a number: q
 Goodbye!
 ```
 
-- Enter any whole number to get its FizzBuzz result
-- Type `q` or `quit` to exit
+---
+
+## CMS-1500 Claims Dataset
+
+Generates 100 synthetic CMS-1500 claims covering all major form fields.
+
+### Usage
+
+```bash
+python generate_claims.py   # creates dat/claims_dataset.csv
+python visualize_claims.py  # creates dat/claims_report.html
+```
+
+### Dashboard features
+
+- Summary cards — total claims, billed, paid, avg charge, collection rate
+- Charts — insurance type, place of service, CPT codes, ICD-10 diagnoses
+- Collapsible hierarchy — claims grouped by Relationship → Insurance Type
+- Searchable, sortable claims table
+
+> **Note:** `dat/` is git-ignored. Data files are generated locally.
