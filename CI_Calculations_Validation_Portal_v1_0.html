@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaimInformatics™ — CI Calculations Validation Portal v1.0</title>
+    <!-- v1.0 | 2026-03-16 | Interactive reference & validation portal for CI Standard Calculations v3.2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           CSS VARIABLES — ClaimInformatics Brand System
+           ============================================================ */
+        :root {
+            --primary: #77256C;
+            --primary-dark: #5a1d52;
+            --primary-light: #945F8D;
+            --primary-faint: rgba(119, 37, 108, 0.06);
+            --accent: #FBB75E;
+            --accent-dark: #e9a045;
+            --accent-light: #fcd59b;
+            --success: #28B296;
+            --success-bg: rgba(40, 178, 150, 0.1);
+            --warning: #FAAF4C;
+            --warning-bg: rgba(250, 175, 76, 0.1);
+            --danger: #EC4273;
+            --danger-bg: rgba(236, 66, 115, 0.1);
+            --info: #439BCB;
+            --info-bg: rgba(67, 155, 203, 0.1);
+            --bg-main: #eef0f4;
+            --bg-card: #ffffff;
+            --bg-nav: rgba(255, 255, 255, 0.95);
+            --text-main: #1a1a2e;
+            --text-muted: #4a5568;
+            --text-light: #718096;
+            --border-color: #d8dce6;
+            --border-strong: #c4c9d6;
+            --shadow-xs: 0 1px 3px rgba(119, 37, 108, 0.06);
+            --shadow-sm: 0 2px 8px rgba(119, 37, 108, 0.08);
+            --shadow-md: 0 8px 24px rgba(119, 37, 108, 0.1);
+            --shadow-lg: 0 16px 48px rgba(119, 37, 108, 0.14);
+            --gradient-primary: linear-gradient(135deg, #77256C 0%, #945f8d 100%);
+            --gradient-hero: linear-gradient(135deg, #5a1d52 0%, #77256C 40%, #945f8d 100%);
+            --gradient-accent: linear-gradient(135deg, #FBB75E 0%, #f8a035 100%);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --font-main: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 15px; scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-up { animation: fadeSlideUp 0.5s ease-out forwards; opacity: 0; }
+        .fade-up-d1 { animation-delay: 0.05s; }
+        .fade-up-d2 { animation-delay: 0.1s; }
+        .fade-up-d3 { animation-delay: 0.15s; }
+        .fade-up-d4 { animation-delay: 0.2s; }
+
+        /* ============================================================ HEADER */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; height: 52px;
+            background: var(--bg-nav);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .header-left { display: flex; align-items: center; gap: 1.5rem; }
+        .header-right { display: flex; align-items: center; gap: 1rem; }
+        .ci-logo { display: flex; align-items: center; gap: 0; font-size: 1.05rem; font-weight: 700; white-space: nowrap; }
+        .ci-logo .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gradient-accent); margin-right: 6px; flex-shrink: 0; }
+        .ci-logo .claim { color: var(--primary); }
+        .ci-logo .informatics { color: var(--accent-dark); }
+        .ci-logo .tm { font-size: 0.55rem; vertical-align: super; color: var(--text-light); margin-left: 1px; }
+        .nav-tabs { display: flex; gap: 2px; }
+        .nav-tab {
+            padding: 6px 14px; border-radius: var(--radius-sm);
+            font-size: 0.78rem; font-weight: 500; cursor: pointer;
+            background: none; border: none; color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .nav-tab:hover { background: var(--primary-faint); color: var(--text-main); }
+        .nav-tab.active { background: var(--primary); color: #fff; }
+        .powered-by { display: flex; flex-direction: column; align-items: flex-end; font-size: 0.55rem; color: var(--text-light); line-height: 1.2; }
+        .powered-logo { font-size: 0.7rem; font-weight: 700; }
+        .powered-logo .claim { color: #77256C; }
+        .powered-logo .informatics { color: #FBB75E; }
+
+        /* ============================================================ PAGE */
+        .page-container { max-width: 1440px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+
+        .client-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 0; margin-bottom: 0.25rem; }
+        .client-header svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+        .client-name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .client-sub { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.5rem; }
+
+        /* ============================================================ STATS ROW */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 1rem 1.1rem;
+            box-shadow: var(--shadow-xs); display: flex; flex-direction: column; gap: 0.15rem;
+        }
+        .stat-card.hero { background: var(--gradient-hero); color: #fff; border: none; box-shadow: var(--shadow-md); }
+        .stat-card.hero .stat-label { color: rgba(255,255,255,0.75); }
+        .stat-card.hero .stat-sub { color: rgba(255,255,255,0.6); }
+        .stat-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+        .stat-sub { font-size: 0.7rem; color: var(--text-light); }
+
+        /* ============================================================ CARDS */
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; box-shadow: var(--shadow-sm); margin-bottom: 1rem; }
+        .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+        .card-subtitle { font-size: 0.72rem; color: var(--text-muted); font-weight: 400; }
+        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .chart-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; box-shadow: var(--shadow-sm); }
+        .chart-box h3 { font-size: 0.88rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); }
+        .chart-wrap { height: 280px; position: relative; }
+
+        /* ============================================================ SECTION BAR */
+        .section-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
+        .section-bar .label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-right: 0.25rem; }
+        .section-btn { padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; background: var(--primary-faint); border: 1px solid transparent; color: var(--text-muted); transition: all 0.2s; white-space: nowrap; }
+        .section-btn:hover { border-color: var(--primary-light); color: var(--primary); }
+        .section-btn.active { background: var(--gradient-primary); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(119, 37, 108, 0.25); }
+
+        /* ============================================================ FILTER BAR */
+        .filter-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .search-input {
+            flex: 1; min-width: 200px; max-width: 340px;
+            padding: 0.45rem 0.9rem; border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color); font-family: var(--font-main);
+            font-size: 0.82rem; background: var(--bg-card); color: var(--text-main);
+            outline: none; transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px var(--primary-faint); }
+        .filter-select {
+            padding: 0.45rem 0.75rem; border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color); font-family: var(--font-main);
+            font-size: 0.82rem; background: var(--bg-card); color: var(--text-main);
+            outline: none; cursor: pointer;
+        }
+        .filter-select:focus { border-color: var(--primary-light); }
+
+        /* ============================================================ METRICS TABLE */
+        .metrics-table { width: 100%; border-collapse: collapse; }
+        .metrics-table th {
+            text-align: left; padding: 0.6rem 0.85rem;
+            font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--border-color);
+            background: var(--bg-main); cursor: pointer; user-select: none;
+            white-space: nowrap;
+        }
+        .metrics-table th:hover { color: var(--primary); }
+        .metrics-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; vertical-align: middle; }
+        .metrics-table tr:hover td { background: var(--primary-faint); }
+        .metrics-table tr:last-child td { border-bottom: none; }
+        .sort-arrow { margin-left: 4px; font-size: 0.65rem; color: var(--text-light); }
+        .sort-arrow.active { color: var(--primary); }
+
+        /* ============================================================ BADGES */
+        .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; }
+        .badge-pass { background: var(--success-bg); color: var(--success); }
+        .badge-warn { background: var(--warning-bg); color: #c47a00; }
+        .badge-fail { background: var(--danger-bg); color: var(--danger); }
+        .badge-info { background: var(--info-bg); color: var(--info); }
+        .badge-core { background: rgba(119,37,108,0.1); color: var(--primary); }
+        .badge-prepay { background: rgba(40,178,150,0.1); color: var(--success); }
+        .badge-postpay { background: rgba(236,66,115,0.1); color: var(--danger); }
+        .badge-financial { background: rgba(251,183,94,0.15); color: #b07000; }
+        .badge-datetime { background: rgba(67,155,203,0.1); color: var(--info); }
+        .badge-profiler { background: rgba(148,95,141,0.12); color: var(--primary-light); }
+        .badge-validation { background: rgba(30,30,60,0.08); color: #4a4a7a; }
+
+        /* ============================================================ EXPAND ROW */
+        .expand-row td { padding: 0; }
+        .expand-body { padding: 1rem 1.25rem; background: #f8f7fb; border-top: 1px dashed var(--border-color); animation: fadeIn 0.2s ease; }
+        .expand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+        .expand-section h4 { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+        .code-block {
+            background: #1a1a2e; color: #e8e0f0; border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem; font-family: var(--font-mono); font-size: 0.72rem;
+            line-height: 1.7; overflow-x: auto; white-space: pre; max-height: 220px; overflow-y: auto;
+        }
+        .code-block .kw { color: #FBB75E; }
+        .code-block .fn { color: #28B296; }
+        .code-block .cm { color: #718096; }
+        .code-block .str { color: #f9a8d4; }
+        .threshold-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .threshold-chip { padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .threshold-chip.pass { background: var(--success-bg); color: var(--success); }
+        .threshold-chip.warn { background: var(--warning-bg); color: #a06000; }
+        .threshold-chip.fail { background: var(--danger-bg); color: var(--danger); }
+        .expand-meta { display: flex; gap: 1.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+        .expand-meta-item { display: flex; flex-direction: column; gap: 2px; }
+        .expand-meta-item .label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .expand-meta-item .val { font-size: 0.82rem; font-weight: 600; }
+        .expand-toggle { cursor: pointer; background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-sm); transition: background 0.15s; }
+        .expand-toggle:hover { background: var(--primary-faint); }
+
+        /* ============================================================ FIELD REFERENCE TABLE */
+        .field-table { width: 100%; border-collapse: collapse; }
+        .field-table th { text-align: left; padding: 0.55rem 0.75rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--border-color); background: var(--bg-main); white-space: nowrap; }
+        .field-table td { padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border-color); font-size: 0.78rem; vertical-align: middle; }
+        .field-table tr:hover td { background: var(--primary-faint); }
+        .field-table tr:last-child td { border-bottom: none; }
+        .cat-divider td { background: var(--primary-faint); font-size: 0.7rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.06em; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--border-color); }
+        .mono { font-family: var(--font-mono); font-size: 0.72rem; color: var(--primary); }
+
+        /* ============================================================ MV RULES */
+        .mv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 1rem; }
+        .mv-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.1rem 1.25rem; box-shadow: var(--shadow-xs); }
+        .mv-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem; gap: 0.5rem; }
+        .mv-id { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--primary); background: var(--primary-faint); padding: 2px 8px; border-radius: var(--radius-sm); flex-shrink: 0; }
+        .mv-name { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
+        .mv-def { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.5; }
+        .mv-thresholds { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.6rem; }
+
+        /* ============================================================ OVERVIEW CATEGORY LIST */
+        .cat-summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+        .cat-summary-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; box-shadow: var(--shadow-xs); display: flex; align-items: center; gap: 0.75rem; }
+        .cat-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .cat-text .cat-title { font-size: 0.78rem; font-weight: 700; color: var(--text-main); }
+        .cat-text .cat-count { font-size: 0.68rem; color: var(--text-muted); }
+        .bar-mini { height: 4px; border-radius: 2px; background: var(--border-color); margin-top: 4px; overflow: hidden; }
+        .bar-mini-fill { height: 100%; border-radius: 2px; background: var(--gradient-primary); }
+
+        /* ============================================================ FOOTER */
+        .portal-footer { text-align: center; padding: 2rem 0 0.5rem; font-size: 0.68rem; color: var(--text-light); border-top: 1px solid var(--border-color); margin-top: 2rem; }
+
+        /* ============================================================ COLUMN EXPLORER */
+        .explorer-drop-zone {
+            border: 2px dashed var(--border-strong); border-radius: var(--radius-lg);
+            padding: 2.5rem 1.5rem; text-align: center; cursor: pointer;
+            background: var(--bg-card); transition: all 0.2s; margin-bottom: 1rem;
+        }
+        .explorer-drop-zone:hover, .explorer-drop-zone.drag-over {
+            border-color: var(--primary); background: var(--primary-faint);
+        }
+        .explorer-drop-zone .drop-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .explorer-drop-zone .drop-title { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
+        .explorer-drop-zone .drop-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .explorer-layout {
+            display: grid; grid-template-columns: 280px 1fr; gap: 1rem;
+            min-height: 520px;
+        }
+        .explorer-left {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .explorer-left-header {
+            padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);
+            background: var(--bg-main);
+        }
+        .explorer-left-header .panel-title { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.4rem; }
+        .explorer-col-search { width: 100%; padding: 0.4rem 0.7rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.78rem; background: var(--bg-card); outline: none; }
+        .explorer-col-search:focus { border-color: var(--primary-light); }
+        .explorer-col-list { flex: 1; overflow-y: auto; }
+        .explorer-col-item {
+            padding: 0.5rem 1rem; font-size: 0.8rem; cursor: pointer;
+            border-bottom: 1px solid var(--border-color); font-family: var(--font-mono);
+            transition: background 0.12s; color: var(--text-main); display: flex; align-items: center; justify-content: space-between;
+        }
+        .explorer-col-item:hover { background: var(--primary-faint); }
+        .explorer-col-item.active { background: var(--primary); color: #fff; font-weight: 600; }
+        .explorer-col-item.active .col-item-count { color: rgba(255,255,255,0.7); }
+        .col-item-count { font-size: 0.65rem; color: var(--text-light); font-family: var(--font-main); }
+        .explorer-right {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .explorer-right-header {
+            padding: 0.75rem 1.1rem; border-bottom: 1px solid var(--border-color);
+            background: var(--bg-main); display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+        }
+        .explorer-col-title { font-size: 1rem; font-weight: 800; color: var(--primary); font-family: var(--font-mono); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .explorer-col-meta { font-size: 0.72rem; color: var(--text-muted); }
+        .explorer-val-controls { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
+        .explorer-val-search { flex: 1; min-width: 140px; max-width: 280px; padding: 0.38rem 0.7rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.78rem; background: var(--bg-card); outline: none; }
+        .explorer-val-search:focus { border-color: var(--primary-light); }
+        .sort-toggle-btn { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); transition: all 0.15s; }
+        .sort-toggle-btn.active { background: var(--primary); color: #fff; border-color: transparent; }
+        .explorer-val-list { flex: 1; overflow-y: auto; }
+        .explorer-val-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.42rem 1.1rem; border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem; transition: background 0.1s;
+        }
+        .explorer-val-item:hover { background: var(--primary-faint); }
+        .explorer-val-item:last-child { border-bottom: none; }
+        .val-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-main); }
+        .val-text.empty-val { color: var(--text-light); font-style: italic; font-family: var(--font-main); }
+        .val-bar-wrap { width: 120px; height: 6px; border-radius: 3px; background: var(--border-color); flex-shrink: 0; overflow: hidden; }
+        .val-bar-fill { height: 100%; border-radius: 3px; background: var(--gradient-primary); }
+        .val-count-badge { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); width: 52px; text-align: right; flex-shrink: 0; }
+        .val-pct-badge { font-size: 0.68rem; color: var(--text-light); width: 40px; text-align: right; flex-shrink: 0; }
+        .explorer-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 3rem; color: var(--text-light); gap: 0.5rem; }
+        .explorer-empty-state .empty-icon { font-size: 2.5rem; }
+        .explorer-empty-state .empty-msg { font-size: 0.88rem; font-weight: 600; color: var(--text-muted); }
+        .explorer-empty-state .empty-sub { font-size: 0.75rem; }
+        .explorer-stats-bar { display: flex; gap: 1.25rem; padding: 0.5rem 1.1rem; background: var(--primary-faint); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
+        .explorer-stat { display: flex; flex-direction: column; gap: 1px; }
+        .explorer-stat .e-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+        .explorer-stat .e-val { font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
+        .file-clear-btn { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--danger); transition: all 0.15s; }
+        .file-clear-btn:hover { background: var(--danger-bg); border-color: var(--danger); }
+
+        /* ============================================================ FIELD MAPPER */
+        .mapper-wrap { display: grid; grid-template-columns: 240px 1fr 280px; gap: 1rem; }
+        .mapper-source {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; overflow: hidden; height: fit-content;
+            position: sticky; top: 60px;
+        }
+        .mapper-source-header {
+            padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);
+            background: var(--bg-main);
+        }
+        .mapper-source-header .panel-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.4rem; }
+        .mapper-col-list { padding: 0.5rem; display: flex; flex-direction: column; gap: 3px; max-height: 520px; overflow-y: auto; }
+        .mapper-col-chip {
+            padding: 6px 10px; border-radius: var(--radius-sm);
+            font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+            cursor: grab; border: 1px solid var(--border-color);
+            background: var(--bg-card); color: var(--text-main);
+            display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;
+            transition: all 0.15s; user-select: none;
+        }
+        .mapper-col-chip:hover { border-color: var(--primary-light); background: var(--primary-faint); }
+        .mapper-col-chip.mapped { border-color: var(--success); background: rgba(40,178,150,0.07); color: var(--success); }
+        .mapper-col-chip.dragging { opacity: 0.4; }
+        .mapper-col-chip.selected { border-color: var(--primary); background: var(--primary-faint); color: var(--primary); font-weight: 700; box-shadow: 0 0 0 2px var(--primary-faint); }
+        .mapper-col-chip.selected.mapped { border-color: var(--primary); color: var(--primary); }
+        .mapper-col-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .mapper-col-chip.mapped .chip-dot { background: var(--success); }
+        .mapper-col-chip:not(.mapped) .chip-dot { background: var(--border-strong); }
+        .mapper-table-wrap { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .mapper-table { width: 100%; border-collapse: collapse; }
+        .mapper-table th {
+            text-align: left; padding: 0.6rem 0.9rem;
+            font-size: 0.7rem; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--border-color); background: var(--bg-main);
+            white-space: nowrap;
+        }
+        .mapper-table td { padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 0.8rem; }
+        .mapper-table tr:last-child td { border-bottom: none; }
+        .mapper-row { transition: background 0.12s; }
+        .mapper-row:hover td { background: var(--primary-faint); }
+        .mapper-row.drop-target td { background: rgba(119,37,108,0.12); outline: 2px dashed var(--primary); outline-offset: -2px; }
+        .mapper-row.mapped-row td { background: rgba(40,178,150,0.04); }
+        .mapper-client-cell { min-width: 200px; }
+        .mapper-drop-zone {
+            border: 1.5px dashed var(--border-color); border-radius: var(--radius-sm);
+            padding: 5px 10px; font-size: 0.75rem; color: var(--text-light);
+            background: var(--bg-main); cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; gap: 0.4rem; min-height: 32px;
+        }
+        .mapper-drop-zone.has-value { border-color: var(--success); background: rgba(40,178,150,0.07); color: var(--success); font-weight: 600; }
+        .mapper-drop-zone.drag-over { border-color: var(--primary); background: var(--primary-faint); color: var(--primary); }
+        .mapper-select { width: 100%; padding: 4px 6px; border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.75rem; background: var(--bg-card); color: var(--text-main); outline: none; cursor: pointer; }
+        .mapper-select:focus { border-color: var(--primary-light); }
+        .mapper-select.has-value { border-color: var(--success); color: var(--success); font-weight: 600; background: rgba(40,178,150,0.05); }
+        .mapper-ci-field { font-size: 0.8rem; color: var(--text-main); }
+        .mapper-arrow { font-size: 0.85rem; color: var(--text-light); padding: 0 0.25rem; text-align: center; width: 32px; }
+        .mapper-arrow.mapped { color: var(--success); }
+        .mapper-clear-btn { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 0.7rem; padding: 2px 4px; border-radius: 3px; flex-shrink: 0; }
+        .mapper-clear-btn:hover { color: var(--danger); background: var(--danger-bg); }
+        .mapper-stats { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem; }
+        .mapper-stat-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+        .mapper-stat-pill.total   { background: var(--primary-faint); color: var(--primary); }
+        .mapper-stat-pill.done    { background: var(--success-bg); color: var(--success); }
+        .mapper-stat-pill.pending { background: var(--warning-bg); color: #a06000; }
+        .mapper-vals-panel {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; overflow: hidden;
+            position: sticky; top: 60px; max-height: 680px;
+        }
+        .mapper-vals-list { overflow-y: auto; padding: 0.35rem 0.5rem; display: flex; flex-direction: column; gap: 1px; flex: 1; min-height: 0; }
+        .mapper-val-row { display: flex; align-items: center; gap: 0.4rem; padding: 5px 6px; border-bottom: 1px solid var(--border-color); font-size: 0.75rem; }
+        .mapper-val-row:last-child { border-bottom: none; }
+        .mapper-val-row:hover { background: var(--primary-faint); }
+        .mapper-val-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); color: var(--text-main); }
+        .mapper-val-count { font-size: 0.68rem; color: var(--text-muted); flex-shrink: 0; min-width: 36px; text-align: right; font-weight: 600; }
+        .mapper-val-bar-wrap { width: 50px; flex-shrink: 0; height: 5px; background: var(--border-color); border-radius: 3px; overflow: hidden; }
+        .mapper-val-bar { height: 100%; background: var(--primary-light); border-radius: 3px; }
+        .mapper-vals-empty { padding: 2.5rem 1.5rem; text-align: center; color: var(--text-light); font-size: 0.8rem; }
+
+        /* ============================================================ RESPONSIVE */
+        @media (max-width: 768px) {
+            .chart-row { grid-template-columns: 1fr; }
+            .expand-grid { grid-template-columns: 1fr; }
+            .mv-grid { grid-template-columns: 1fr; }
+            .nav-tabs { display: none; }
+            .cat-summary-grid { grid-template-columns: 1fr 1fr; }
+            .explorer-layout { grid-template-columns: 1fr; }
+            .mapper-wrap { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useRef, useEffect, useCallback } = React;
+
+// ============================================================
+// DATA — CI Standard Calculations v3.2
+// ============================================================
+const METRICS = [
+  // ---- CORE METRICS ----
+  { id:'CM-1', category:'Core', name:'Number of Employees', pbiVisual:'Card',
+    definition:'Count of distinct employees/members in the claim data.',
+    sql:`SELECT COUNT(DISTINCT\n    COALESCE(cl_memid, cl_eessn,\n        CONCAT(cl_eefn, cl_eeln, cl_eedob)))\nFROM claim cl\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Employee Count =\nCALCULATE(\n    DISTINCTCOUNT(Claim[cl_memid]),\n    Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'CM-2', category:'Core', name:'Number of Patients', pbiVisual:'Card',
+    definition:'Count of distinct patients across all claims.',
+    sql:`SELECT COUNT(DISTINCT\n    COALESCE(cl_ptid, cl_ptssn, cl_ptacctno,\n        CONCAT(cl_ptfn, cl_ptln, cl_ptdob)))\nFROM claim cl\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Patient Count =\nCALCULATE(\n    DISTINCTCOUNT(Claim[cl_ptid]),\n    Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'CM-3', category:'Core', name:'Claim Count', pbiVisual:'Card',
+    definition:'Total number of distinct claims.',
+    sql:`SELECT COUNT(DISTINCT cl.cl_claimid)\nFROM claim cl\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Claim Count =\nCALCULATE(\n    DISTINCTCOUNT(Claim[cl_claimid]),\n    Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'CM-4', category:'Core', name:'Claimline Count', pbiVisual:'Card',
+    definition:'Total number of service lines across all claims.',
+    sql:`SELECT COUNT(*)\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Claimline Count =\nCALCULATE(\n    COUNTROWS(Claimline),\n    FILTER(Claimline,\n        Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])),\n    FILTER(RELATEDTABLE(Claim),\n        Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore]))\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'CM-5', category:'Core', name:'Total Paid / Total Spend', pbiVisual:'Card (currency)',
+    definition:'Sum of all paid amounts across claim lines.',
+    sql:`SELECT SUM(ln.ln_paid)\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Total Paid =\nCALCULATE(\n    SUM(Claimline[ln_paid]),\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore]),\n    FILTER(RELATEDTABLE(Claim),\n        Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore]))\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'CM-6', category:'Core', name:'Scope Begin Paid Date', pbiVisual:'Card (date)',
+    definition:'Earliest payment date in the dataset.',
+    sql:`SELECT MIN(ln.ln_datepaid)\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Scope Begin Date =\nCALCULATE(\n    MIN(Claimline[ln_datepaid]),\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'CM-7', category:'Core', name:'Scope End Paid Date', pbiVisual:'Card (date)',
+    definition:'Latest payment date in the dataset.',
+    sql:`SELECT MAX(ln.ln_datepaid)\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Scope End Date =\nCALCULATE(\n    MAX(Claimline[ln_datepaid]),\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+
+  // ---- PRE-PAY METRICS ----
+  { id:'PP-1', category:'Pre-Pay', name:'Pre-Pay Savings Identified', pbiVisual:'Card (currency)',
+    definition:'Total savings identified through pre-payment review.',
+    sql:`SELECT SUM(ln.ln_savings_identified)\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND cl.cl_service_type = 'Pre-Payment'\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`PrePay Savings =\nCALCULATE(\n    SUM(Claimline[ln_savings_identified]),\n    Claim[cl_service_type] = "Pre-Payment",\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'PP-2', category:'Pre-Pay', name:'Pre-Pay Savings Rate', pbiVisual:'Gauge / KPI',
+    definition:'Percentage of analyzed spend that resulted in savings.',
+    sql:`SELECT\n    CASE\n        WHEN SUM(ln.ln_charged) > 0\n        THEN (SUM(ln.ln_savings_identified)\n            / SUM(ln.ln_charged)) * 100\n        ELSE 0\n    END AS savings_rate\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND cl.cl_service_type = 'Pre-Payment'\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`PrePay Savings Rate =\nVAR TotalCharged = [PrePay Total Charged]\nVAR TotalSavings = [PrePay Savings]\nRETURN\n    IF(TotalCharged > 0,\n        DIVIDE(TotalSavings, TotalCharged, 0) * 100,\n        0\n    )`,
+    thresholds:null, status:'Implemented' },
+  { id:'PP-3', category:'Pre-Pay', name:'Average Savings Per Claim', pbiVisual:'Card (currency)',
+    definition:'Average savings amount per claim.',
+    sql:`SELECT\n    CASE\n        WHEN COUNT(DISTINCT cl.cl_claimid) > 0\n        THEN SUM(ln.ln_savings_identified)\n            / COUNT(DISTINCT cl.cl_claimid)\n        ELSE 0\n    END\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND cl.cl_service_type = 'Pre-Payment'\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Avg Savings Per Claim =\nDIVIDE(\n    [PrePay Savings],\n    [PrePay Claim Count],\n    0\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'PP-4', category:'Pre-Pay', name:'Pre-Pay Total Charged', pbiVisual:'Card (currency)',
+    definition:'Total billed/charged amount for pre-payment review claims.',
+    sql:`SELECT SUM(ln.ln_charged)\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND cl.cl_service_type = 'Pre-Payment'\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`PrePay Total Charged =\nCALCULATE(\n    SUM(Claimline[ln_charged]),\n    Claim[cl_service_type] = "Pre-Payment",\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'PP-5', category:'Pre-Pay', name:'Pre-Pay Claim Count', pbiVisual:'Card',
+    definition:'Count of distinct claims submitted for pre-payment review.',
+    sql:`SELECT COUNT(DISTINCT cl.cl_claimid)\nFROM claim cl\nWHERE cl.cl_clientpk = :clientpk\n  AND cl.cl_service_type = 'Pre-Payment'\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`PrePay Claim Count =\nCALCULATE(\n    DISTINCTCOUNT(Claim[cl_claimid]),\n    Claim[cl_service_type] = "Pre-Payment",\n    Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+
+  // ---- POST-PAY METRICS ----
+  { id:'POST-1', category:'Post-Pay', name:'Total Overpayments Identified', pbiVisual:'Card (currency)',
+    definition:'Sum of overpayments identified in post-payment review.',
+    sql:`SELECT SUM(r.recovery_amount)\nFROM recovery r\nJOIN claim cl ON r.cl_claimid = cl.cl_claimid\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Total Overpayments =\nCALCULATE(\n    SUM(Recovery[recovery_amount]),\n    FILTER(\n        RELATEDTABLE(Claim),\n        Claim[cl_ci_ignore] = 0\n            || ISBLANK(Claim[cl_ci_ignore])\n    )\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'POST-2', category:'Post-Pay', name:'Total Recovered', pbiVisual:'Card (currency)',
+    definition:'Sum of amounts actually recovered from overpayments.',
+    sql:`SELECT SUM(rp.payment_amount)\nFROM recovery r\nJOIN recovery_payment rp ON r.recovery_id = rp.recovery_id\nJOIN claim cl ON r.cl_claimid = cl.cl_claimid\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Total Recovered =\nCALCULATE(\n    SUM(Recovery_Payment[payment_amount]),\n    FILTER(RELATEDTABLE(Recovery),\n        NOT(ISBLANK(RELATED(Claim[cl_claimid])))),\n    FILTER(RELATEDTABLE(Claim),\n        Claim[cl_ci_ignore] = 0\n            || ISBLANK(Claim[cl_ci_ignore]))\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'POST-3', category:'Post-Pay', name:'Recovery Rate', pbiVisual:'Gauge / KPI',
+    definition:'Percentage of identified overpayments that were recovered.',
+    sql:`SELECT\n    CASE\n        WHEN SUM(r.recovery_amount) > 0\n        THEN (SUM(rp.payment_amount)\n            / SUM(r.recovery_amount)) * 100\n        ELSE 0\n    END AS recovery_rate\nFROM recovery r\nLEFT JOIN recovery_payment rp\n    ON r.recovery_id = rp.recovery_id\nJOIN claim cl ON r.cl_claimid = cl.cl_claimid\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Recovery Rate =\nVAR TotalIdentified = [Total Overpayments]\nVAR TotalRecovered  = [Total Recovered]\nRETURN\n    IF(TotalIdentified > 0,\n        DIVIDE(TotalRecovered, TotalIdentified, 0) * 100,\n        0\n    )`,
+    thresholds:null, status:'Implemented' },
+  { id:'POST-4', category:'Post-Pay', name:'Average Days to Recovery', pbiVisual:'Card',
+    definition:'Average number of days between identification and recovery.',
+    sql:`SELECT AVG(DATEDIFF(rp.payment_date, r.identified_date))\nFROM recovery r\nJOIN recovery_payment rp ON r.recovery_id = rp.recovery_id\nJOIN claim cl ON r.cl_claimid = cl.cl_claimid\nWHERE cl.cl_clientpk = :clientpk\n  AND rp.payment_date IS NOT NULL\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Avg Days to Recovery =\nAVERAGEX(\n    FILTER(Recovery_Payment,\n        NOT(ISBLANK(Recovery_Payment[payment_date]))),\n    DATEDIFF(\n        RELATED(Recovery[identified_date]),\n        Recovery_Payment[payment_date],\n        DAY\n    )\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'POST-5', category:'Post-Pay', name:'Outstanding Recoveries', pbiVisual:'Card (currency)',
+    definition:'Amount of identified overpayments not yet recovered.',
+    sql:`SELECT SUM(r.recovery_amount)\n    - COALESCE(SUM(rp.payment_amount), 0)\nFROM recovery r\nLEFT JOIN recovery_payment rp\n    ON r.recovery_id = rp.recovery_id\nJOIN claim cl ON r.cl_claimid = cl.cl_claimid\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0;`,
+    dax:`Outstanding Recoveries =\n[Total Overpayments] - [Total Recovered]`,
+    thresholds:null, status:'Implemented' },
+
+  // ---- FINANCIAL ----
+  { id:'FIN-1', category:'Financial', name:'PMPM (Per Member Per Month)', pbiVisual:'Card (currency)',
+    definition:'Average cost per member per month.',
+    sql:`SELECT SUM(ln.ln_paid) /\n    (COUNT(DISTINCT cl.cl_memid) *\n     (DATEDIFF(MAX(ln.ln_datepaid),\n              MIN(ln.ln_datepaid)) / 30.44))\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`PMPM =\nVAR TotalPaid    = [Total Paid]\nVAR MemberCount  = [Employee Count]\nVAR MonthsInScope =\n    DATEDIFF([Scope Begin Date],\n             [Scope End Date], MONTH) + 1\nRETURN\n    IF(MemberCount > 0 && MonthsInScope > 0,\n        DIVIDE(TotalPaid,\n               MemberCount * MonthsInScope, 0),\n        0\n    )`,
+    thresholds:null, status:'Implemented' },
+  { id:'FIN-2', category:'Financial', name:'PPPM (Per Patient Per Month)', pbiVisual:'Card (currency)',
+    definition:'Average cost per patient per month.',
+    sql:`SELECT SUM(ln.ln_paid) /\n    (COUNT(DISTINCT cl.cl_ptid) *\n     (DATEDIFF(MAX(ln.ln_datepaid),\n              MIN(ln.ln_datepaid)) / 30.44))\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`PPPM =\nVAR TotalPaid    = [Total Paid]\nVAR PatientCount = [Patient Count]\nVAR MonthsInScope =\n    DATEDIFF([Scope Begin Date],\n             [Scope End Date], MONTH) + 1\nRETURN\n    IF(PatientCount > 0 && MonthsInScope > 0,\n        DIVIDE(TotalPaid,\n               PatientCount * MonthsInScope, 0),\n        0\n    )`,
+    thresholds:null, status:'Implemented' },
+  { id:'FIN-3', category:'Financial', name:'Month-over-Month Variance', pbiVisual:'KPI (trend)',
+    definition:'Percentage change in total paid from the previous month.',
+    sql:null,
+    dax:`MoM Variance % =\nVAR CurrentMonth  = [Total Paid]\nVAR PreviousMonth =\n    CALCULATE(\n        [Total Paid],\n        DATEADD(Calendar[Date], -1, MONTH)\n    )\nRETURN\n    IF(PreviousMonth > 0,\n        DIVIDE(CurrentMonth - PreviousMonth,\n               PreviousMonth, 0) * 100,\n        0\n    )`,
+    thresholds:null, status:'Implemented' },
+  { id:'FIN-4', category:'Financial', name:'Year-over-Year Variance', pbiVisual:'KPI (trend)',
+    definition:'Percentage change from the same period in the prior year.',
+    sql:null,
+    dax:`YoY Variance % =\nVAR CurrentPeriod = [Total Paid]\nVAR PriorYear =\n    CALCULATE(\n        [Total Paid],\n        SAMEPERIODLASTYEAR(Calendar[Date])\n    )\nRETURN\n    IF(PriorYear > 0,\n        DIVIDE(CurrentPeriod - PriorYear,\n               PriorYear, 0) * 100,\n        0\n    )`,
+    thresholds:null, status:'Implemented' },
+  { id:'FIN-5', category:'Financial', name:'Average Paid Per Claim', pbiVisual:'Card (currency)',
+    definition:'Average payment amount per distinct claim.',
+    sql:`SELECT CASE\n    WHEN COUNT(DISTINCT cl.cl_claimid) > 0\n    THEN SUM(ln.ln_paid)\n        / COUNT(DISTINCT cl.cl_claimid)\n    ELSE 0\nEND\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Avg Paid Per Claim =\nDIVIDE([Total Paid], [Claim Count], 0)`,
+    thresholds:null, status:'Implemented' },
+  { id:'FIN-6', category:'Financial', name:'Average Paid Per Claimline', pbiVisual:'Card (currency)',
+    definition:'Average payment amount per service line.',
+    sql:`SELECT CASE\n    WHEN COUNT(*) > 0\n    THEN SUM(ln.ln_paid) / COUNT(*)\n    ELSE 0\nEND\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Avg Paid Per Claimline =\nDIVIDE([Total Paid], [Claimline Count], 0)`,
+    thresholds:null, status:'Implemented' },
+
+  // ---- DATE & TIME ----
+  { id:'DT-1', category:'Date & Time', name:'Claims by Month', pbiVisual:'Line / Clustered Column',
+    definition:'Monthly aggregation of claims and payments.',
+    sql:`SELECT\n    DATE_FORMAT(ln.ln_datepaid, '%Y-%m') AS month,\n    COUNT(DISTINCT cl.cl_claimid) AS claim_count,\n    SUM(ln.ln_paid) AS total_paid\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0\nGROUP BY DATE_FORMAT(ln.ln_datepaid, '%Y-%m')\nORDER BY month;`,
+    dax:`-- Use Calendar table grouped by YearMonth\n-- with [Total Paid] and [Claim Count] measures`,
+    thresholds:null, status:'Implemented' },
+  { id:'DT-2', category:'Date & Time', name:'Claims by Quarter', pbiVisual:'Bar / Line',
+    definition:'Quarterly aggregation of claims and payments.',
+    sql:`SELECT\n    CONCAT(YEAR(ln.ln_datepaid), '-Q',\n        QUARTER(ln.ln_datepaid)) AS quarter,\n    COUNT(DISTINCT cl.cl_claimid) AS claim_count,\n    SUM(ln.ln_paid) AS total_paid\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0\nGROUP BY YEAR(ln.ln_datepaid), QUARTER(ln.ln_datepaid)\nORDER BY quarter;`,
+    dax:`-- Use Calendar table grouped by YearQuarter`,
+    thresholds:null, status:'Implemented' },
+  { id:'DT-3', category:'Date & Time', name:'Days Since Last Claim', pbiVisual:'Card',
+    definition:'Number of days since the most recent claim payment.',
+    sql:`SELECT DATEDIFF(CURDATE(), MAX(ln.ln_datepaid))\nFROM claim cl\nJOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE ln.ln_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Days Since Last Claim =\nDATEDIFF([Scope End Date], TODAY(), DAY)`,
+    thresholds:null, status:'Implemented' },
+  { id:'DT-4', category:'Date & Time', name:'3-Month Moving Average', pbiVisual:'Line',
+    definition:'Rolling 3-month average of total paid for trend smoothing.',
+    sql:null,
+    dax:`3-Month Moving Avg =\nAVERAGEX(\n    DATESINPERIOD(\n        Calendar[Date],\n        MAX(Calendar[Date]),\n        -3,\n        MONTH\n    ),\n    [Total Paid]\n)`,
+    thresholds:null, status:'Implemented' },
+
+  // ---- FIELD PROFILER ----
+  { id:'FP-1', category:'Field Profiler', name:'Field Completeness %', pbiVisual:'Data bar (matrix)',
+    definition:'Percentage of non-null, non-empty values for a single column across all claimlines.',
+    sql:`SELECT\n    'column_name' AS field_name,\n    COUNT(*) AS total_rows,\n    COUNT(column_name) AS filled_count,\n    SUM(CASE WHEN column_name IS NULL\n        OR TRIM(column_name::text) = ''\n        THEN 1 ELSE 0 END) AS null_count,\n    ROUND(\n        COUNT(column_name)::numeric\n        / COUNT(*)::numeric, 4\n    ) AS pct_filled\nFROM claim cl\nJOIN claimline ln ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Field Completeness % =\nDIVIDE(\n    COUNTROWS(FILTER(Data,\n        NOT(ISBLANK(Data[SelectedColumn]))\n        && (Data[cl_ci_ignore] = 0\n            || ISBLANK(Data[cl_ci_ignore])))),\n    COUNTROWS(FILTER(Data,\n        Data[cl_ci_ignore] = 0\n        || ISBLANK(Data[cl_ci_ignore]))),\n    0\n)`,
+    thresholds:[{label:'≥90% — Pass',cls:'pass'},{label:'50–90% — Warn',cls:'warn'},{label:'<50% — Fail',cls:'fail'}],
+    status:'Implemented' },
+  { id:'FP-2', category:'Field Profiler', name:'Top Value Distribution', pbiVisual:'Horizontal bar (drillthrough)',
+    definition:'Top 30 most frequent values with frequency counts and percentage of total rows.',
+    sql:`SELECT column_name AS value,\n    COUNT(*) AS frequency,\n    ROUND(COUNT(*)::numeric /\n        (SELECT COUNT(*) FROM claim cl\n         JOIN claimline ln\n             ON cl.cl_claimid = ln.ln_claimid\n             AND cl.cl_clientpk = ln.ln_clientpk\n         WHERE cl.cl_clientpk = :clientpk\n             AND COALESCE(cl.cl_ci_ignore, 0) = 0\n             AND COALESCE(ln.ln_ci_ignore, 0) = 0\n        )::numeric, 4) AS pct_of_total\nFROM claim cl JOIN claimline ln\n    ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0\n  AND column_name IS NOT NULL\nGROUP BY 1 ORDER BY 2 DESC LIMIT 30;`,
+    dax:`Value Frequency =\nCALCULATE(\n    COUNTROWS(Data),\n    Data[cl_ci_ignore] = 0\n        || ISBLANK(Data[cl_ci_ignore])\n)\n-- Used in matrix grouped by column value`,
+    thresholds:null, status:'Implemented' },
+  { id:'FP-3', category:'Field Profiler', name:'Distinct Value Count', pbiVisual:'Numeric column (matrix)',
+    definition:'Count of unique non-null values in a column.',
+    sql:`SELECT COUNT(DISTINCT column_name) AS distinct_count\nFROM claim cl\nJOIN claimline ln ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0\n  AND column_name IS NOT NULL\n  AND TRIM(column_name::text) <> '';`,
+    dax:`Distinct Value Count =\nCALCULATE(\n    DISTINCTCOUNT(Data[SelectedColumn]),\n    Data[cl_ci_ignore] = 0\n        || ISBLANK(Data[cl_ci_ignore])\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'FP-4', category:'Field Profiler', name:'Cardinality Ratio', pbiVisual:'% column (matrix)',
+    definition:'Distinct values / filled count. High (>50%) = unique identifiers; low (<1%) = categorical.',
+    sql:`SELECT\n    COUNT(DISTINCT column_name)::numeric /\n    NULLIF(COUNT(column_name), 0)::numeric\n        AS cardinality_ratio\nFROM claim cl\nJOIN claimline ln ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0\n  AND column_name IS NOT NULL;`,
+    dax:`Cardinality Ratio =\nDIVIDE(\n    DISTINCTCOUNT(Data[SelectedColumn]),\n    COUNTROWS(FILTER(Data,\n        NOT(ISBLANK(Data[SelectedColumn])))),\n    0\n)`,
+    thresholds:[{label:'>50% — High (ID fields)',cls:'pass'},{label:'1–50% — Medium',cls:'warn'},{label:'<1% — Low (categorical)',cls:'fail'}],
+    status:'Implemented' },
+  { id:'FP-5', category:'Field Profiler', name:'Weighted Overall Completeness', pbiVisual:'Hero card',
+    definition:'Total filled cells / total possible cells across all profiled columns. True weighted average.',
+    sql:`WITH field_stats AS (\n    SELECT 'field_name', COUNT(*), COUNT(field)\n    FROM claim cl JOIN claimline ln\n        ON cl.cl_claimid = ln.ln_claimid\n    WHERE cl.cl_clientpk = :clientpk\n        AND COALESCE(cl.cl_ci_ignore, 0) = 0\n        AND COALESCE(ln.ln_ci_ignore, 0) = 0\n    -- UNION ALL for each column ...\n)\nSELECT\n    SUM(filled_count) AS total_filled_cells,\n    SUM(total_rows)   AS total_possible_cells,\n    ROUND(SUM(filled_count)::numeric /\n        NULLIF(SUM(total_rows), 0)::numeric, 4\n    ) AS weighted_completeness\nFROM field_stats;`,
+    dax:`Weighted Completeness =\nVAR TotalCells  = COUNTROWS(Data) * [Column Count]\nVAR FilledCells =\n    SUMX(\n        FieldMetadata,\n        CALCULATE(\n            COUNTROWS(FILTER(Data,\n                NOT(ISBLANK(Data[CurrentField]))\n            ))\n        )\n    )\nRETURN DIVIDE(FilledCells, TotalCells, 0)`,
+    thresholds:[{label:'≥90% — Pass',cls:'pass'},{label:'50–90% — Warn',cls:'warn'},{label:'<50% — Fail',cls:'fail'}],
+    status:'Implemented' },
+  { id:'FP-6', category:'Field Profiler', name:'Category Completeness Summary', pbiVisual:'Matrix / Small multiples',
+    definition:'Average completeness across all fields within a functional category (15 categories, 93 fields).',
+    sql:`SELECT category, AVG(pct_filled) AS avg_completeness,\n    COUNT(*) AS field_count\nFROM category_fields cf\nCROSS JOIN LATERAL unnest(cf.fields) AS f(field_name)\nJOIN field_completeness_stats fs\n    ON fs.field_name = f.field_name\nGROUP BY 1 ORDER BY 2 DESC;`,
+    dax:`Category Completeness =\nAVERAGEX(\n    FILTER(FieldMetadata,\n        FieldMetadata[Category] =\n            SELECTEDVALUE(Categories[CategoryName])\n    ),\n    [Field Completeness %]\n)`,
+    thresholds:null, status:'Implemented' },
+  { id:'FP-7', category:'Field Profiler', name:'Completeness Classification Band', pbiVisual:'Filter chips / slicer',
+    definition:'Categorizes each field completeness into actionable bands.',
+    sql:null,
+    dax:`Completeness Band =\nSWITCH(TRUE(),\n    [Field Completeness %] >= 0.99, "Complete",\n    [Field Completeness %] >= 0.50, "Partial",\n    [Field Completeness %] >  0,   "Sparse",\n    "Empty"\n)`,
+    thresholds:[{label:'≥99% — Complete',cls:'pass'},{label:'50–99% — Partial',cls:'warn'},{label:'>0 & <50% — Sparse',cls:'fail'},{label:'0% — Empty',cls:'fail'}],
+    status:'Implemented' },
+  { id:'FP-8', category:'Field Profiler', name:'Null / Empty Count', pbiVisual:'Numeric column (table)',
+    definition:'Count of rows where a column value is NULL or empty string.',
+    sql:`SELECT SUM(CASE\n    WHEN column_name IS NULL\n        OR TRIM(column_name::text) = ''\n    THEN 1 ELSE 0 END) AS null_count\nFROM claim cl\nJOIN claimline ln ON cl.cl_claimid = ln.ln_claimid\n    AND cl.cl_clientpk = ln.ln_clientpk\nWHERE cl.cl_clientpk = :clientpk\n  AND COALESCE(cl.cl_ci_ignore, 0) = 0\n  AND COALESCE(ln.ln_ci_ignore, 0) = 0;`,
+    dax:`Null Count =\nCALCULATE(\n    COUNTROWS(FILTER(Data,\n        ISBLANK(Data[SelectedColumn]))),\n    Data[cl_ci_ignore] = 0\n        || ISBLANK(Data[cl_ci_ignore])\n)`,
+    thresholds:[{label:'= 0 — Pass',cls:'pass'},{label:'> 0 — Fail',cls:'fail'}],
+    status:'Implemented' },
+];
+
+const MV_RULES = [
+  { id:'MV-1', name:'Mapping Coverage Rate',
+    definition:'Percentage of source extract columns that have a defined CI database field mapping.',
+    thresholds:[{label:'≥95% — Pass',cls:'pass'},{label:'80–95% — Warn',cls:'warn'},{label:'<80% — Fail',cls:'fail'}] },
+  { id:'MV-2', name:'Required Field Readiness',
+    definition:'Percentage of required CI fields whose source column has ≥95% population rate.',
+    thresholds:[{label:'100% — Pass',cls:'pass'},{label:'80–99% — Warn',cls:'warn'},{label:'<80% — Fail',cls:'fail'}] },
+  { id:'MV-3', name:'Data Type Compatibility Score',
+    definition:'Percentage of mapped fields where source data type exactly matches expected CI target type. Classifies as Exact, Ambiguous, or Mismatch.',
+    thresholds:null },
+  { id:'MV-4', name:'Pre-Mapping Validation Status (Per-Field)',
+    definition:'Composite status combining completeness, type consistency, cardinality, and mapping. FAIL if any check fails; WARN if any check warns; else PASS.',
+    thresholds:[{label:'All checks pass — PASS',cls:'pass'},{label:'Any check warns — WARN',cls:'warn'},{label:'Any check fails — FAIL',cls:'fail'}] },
+  { id:'MV-5', name:'Post-Mapping Field Validation (Per-Field)',
+    definition:'Verification that each mapped source column correctly targets a CI database field, with type compatibility and population status.',
+    thresholds:[{label:'Required ✓ — Filled + Required',cls:'pass'},{label:'Mapped — Filled, optional',cls:'warn'},{label:'REQUIRED ✗ — Missing required',cls:'fail'}] },
+  { id:'MV-6', name:'Dual-Mapped Field Count',
+    definition:'Count of source columns that map to both the claim and claimline tables simultaneously (e.g., Claim Number → cl_claimid + ln_claimid).',
+    thresholds:null },
+  { id:'MV-7', name:'EDI Source Traceability Rate',
+    definition:'Percentage of mapped CI fields that have a documented EDI transaction set source (837P, 837I, 835, or 834).',
+    thresholds:[{label:'≥95% — Pass',cls:'pass'},{label:'80–95% — Warn',cls:'warn'},{label:'<80% — Fail',cls:'fail'}] },
+  { id:'MV-8', name:'Category-Level Mapping Completeness',
+    definition:'For each functional category (15 total), the percentage of fields within that category that have CI mappings defined.',
+    thresholds:null },
+  { id:'MV-9', name:'Pre vs Post Population Delta',
+    definition:'Absolute change in field population rate between the source extract and the post-mapping CI database load. Detects data loss during ETL.',
+    thresholds:[{label:'≤2% delta — Pass',cls:'pass'},{label:'2–10% delta — Warn',cls:'warn'},{label:'>10% delta — Fail',cls:'fail'}] },
+  { id:'MV-10', name:'Overall Mapping Health Score',
+    definition:'Composite score (0–100) combining mapping coverage, type compatibility, required readiness, and EDI traceability rates.',
+    thresholds:[{label:'≥90 — Excellent',cls:'pass'},{label:'70–89 — Acceptable',cls:'warn'},{label:'<70 — Needs Review',cls:'fail'}] },
+];
+
+const FIELD_REFERENCE = [
+  { cat:'Claim Identification', extract:'Claim Number', db:'cl_claimid', table:'claim', edi:'837/835' },
+  { cat:'Claim Identification', extract:'Claim Line Number', db:'ln_linenum', table:'claimline', edi:'837 LX01' },
+  { cat:'Claim Identification', extract:'Claim Status Code', db:'cl_claimstatus', table:'claim', edi:'835 CLP02' },
+  { cat:'Claim Identification', extract:'Claim Type', db:'cl_claimtype', table:'claim', edi:'835 CLP06' },
+  { cat:'Claim Identification', extract:'Patient Control / Account Number', db:'cl_ptacctno', table:'claim', edi:'837 CLM01' },
+  { cat:'Service Details', extract:'Place of Service', db:'ln_pos', table:'claimline', edi:'837 SV105' },
+  { cat:'Service Details', extract:'From Date of Service (Professional)', db:'ln_dateserv', table:'claimline', edi:'837 DTP (472)' },
+  { cat:'Service Details', extract:'To Date of Service (Professional)', db:'ln_dateserv_to', table:'claimline', edi:'837 DTP (472)' },
+  { cat:'Service Details', extract:'Statement Covers Period: From (UB04)', db:'cl_dateadmit', table:'claim', edi:'837I DTP (096)' },
+  { cat:'Service Details', extract:'Statement Covers Period: Through (UB04)', db:'cl_datedisch', table:'claim', edi:'837I DTP (097)' },
+  { cat:'Service Details', extract:'Type of Service', db:'ln_tos', table:'claimline', edi:'837 SV101-1' },
+  { cat:'Service Details', extract:'Type of Bill', db:'cl_typeofbill', table:'claim', edi:'837I CLM05-1' },
+  { cat:'Procedure Codes', extract:'CPT / HCPCS Code (Professional)', db:'ln_proc', table:'claimline', edi:'837P SV101-2' },
+  { cat:'Procedure Codes', extract:'Revenue Code', db:'ln_revcode', table:'claimline', edi:'837I SV201' },
+  { cat:'Procedure Codes', extract:'CPT / HCPCS / HIPPS Code (Facility)', db:'ln_proc_fac', table:'claimline', edi:'837I SV202' },
+  { cat:'Procedure Codes', extract:'DRG Code', db:'cl_drg', table:'claim', edi:'837I HI (DRG)' },
+  { cat:'Procedure Codes', extract:'NDC Number', db:'ln_ndc', table:'claimline', edi:'837 LIN' },
+  { cat:'Modifiers & Units', extract:'Units', db:'ln_units', table:'claimline', edi:'837 SV104' },
+  { cat:'Modifiers & Units', extract:'Modifier 1', db:'ln_mod1', table:'claimline', edi:'837 SV101-3' },
+  { cat:'Modifiers & Units', extract:'Modifier 2', db:'ln_mod2', table:'claimline', edi:'837 SV101-4' },
+  { cat:'Modifiers & Units', extract:'Modifier 3', db:'ln_mod3', table:'claimline', edi:'837 SV101-5' },
+  { cat:'Modifiers & Units', extract:'Modifier 4', db:'ln_mod4', table:'claimline', edi:'837 SV101-6' },
+  { cat:'Modifiers & Units', extract:'Anesthesia Minutes', db:'ln_anesthmin', table:'claimline', edi:'837 SV104' },
+  { cat:'Modifiers & Units', extract:'Quantity', db:'ln_qty', table:'claimline', edi:'835 SVC' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 1', db:'cl_diag1', table:'claim', edi:'837 HI (ABK/ABF)' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 2', db:'cl_diag2', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 3', db:'cl_diag3', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 4', db:'cl_diag4', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 5', db:'cl_diag5', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 6', db:'cl_diag6', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 7', db:'cl_diag7', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 8', db:'cl_diag8', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 9', db:'cl_diag9', table:'claim', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 10', db:'cl_diag10', table:'claim', edi:'837 HI' },
+  { cat:'Financial', extract:'Billed / Charged Amount', db:'ln_charged', table:'claimline', edi:'837 SV102 / 835 SVC02' },
+  { cat:'Financial', extract:'Allowed Amount', db:'ln_allowed', table:'claimline', edi:'835 SVC03' },
+  { cat:'Financial', extract:'Paid Amount', db:'ln_paid', table:'claimline', edi:'835 SVC03' },
+  { cat:'Financial', extract:'Deductible Amount', db:'ln_deductible', table:'claimline', edi:'835 CAS (1)' },
+  { cat:'Financial', extract:'Copay Amount', db:'ln_copay', table:'claimline', edi:'835 CAS (2)' },
+  { cat:'Financial', extract:'Coinsurance Amount', db:'ln_coinsurance', table:'claimline', edi:'835 CAS (3)' },
+  { cat:'Financial', extract:'Not Covered Amount', db:'ln_notcovered', table:'claimline', edi:'835 CAS' },
+  { cat:'Financial', extract:'Not Covered Reason Code', db:'ln_notcovered_reason', table:'claimline', edi:'835 CAS' },
+  { cat:'Financial', extract:'COB Savings', db:'ln_cobsavings', table:'claimline', edi:'835' },
+  { cat:'Payment Details', extract:'Payee', db:'cl_payee', table:'claim', edi:'835 N1 (PE)' },
+  { cat:'Payment Details', extract:'Claim Paid Date', db:'ln_datepaid', table:'claimline', edi:'835 DTM (405)' },
+  { cat:'Payment Details', extract:'Check Number', db:'cl_checkno', table:'claim', edi:'835 TRN02' },
+  { cat:'Admission / Discharge', extract:'Admission Date', db:'cl_dateadmit', table:'claim', edi:'837I DTP (435)' },
+  { cat:'Admission / Discharge', extract:'Discharge Date', db:'cl_datedisch', table:'claim', edi:'837I DTP (096)' },
+  { cat:'Admission / Discharge', extract:'Admission Type', db:'cl_admtype', table:'claim', edi:'837I CL103' },
+  { cat:'Admission / Discharge', extract:'Admission Source', db:'cl_admsource', table:'claim', edi:'837I CL104' },
+  { cat:'Admission / Discharge', extract:'Patient Status', db:'cl_ptstatus', table:'claim', edi:'837I CL105' },
+  { cat:'Admission / Discharge', extract:'DRG Code', db:'cl_drg', table:'claim', edi:'837I HI (DRG)' },
+  { cat:'Admission / Discharge', extract:'Length of Stay', db:'cl_los', table:'claim', edi:'Derived' },
+  { cat:'Provider - Rendering', extract:'Service Provider Federal Tax ID', db:'prv_taxid', table:'claim', edi:'837 REF (EI)' },
+  { cat:'Provider - Rendering', extract:'Service/Rendering Provider NPI', db:'prv_npi', table:'claimline', edi:'837 NM109 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider (Group) Name', db:'prv_grpname', table:'claim', edi:'837 NM103 (77)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Name', db:'prv_name', table:'claim', edi:'837 NM103 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Address', db:'prv_addr1', table:'claim', edi:'837 N3 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Address 2', db:'prv_addr2', table:'claim', edi:'837 N3 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider City', db:'prv_city', table:'claim', edi:'837 N4 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider State', db:'prv_state', table:'claim', edi:'837 N4 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Zip', db:'prv_zip', table:'claim', edi:'837 N4 (82)' },
+  { cat:'Provider - Rendering', extract:'Taxonomy Code', db:'prv_taxonomy', table:'claim', edi:'837 PRV03' },
+  { cat:'Provider - Billing', extract:'Billing Provider Tax ID', db:'cl_billtaxid', table:'claim', edi:'837 REF (EI) (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider NPI', db:'cl_billnpi', table:'claim', edi:'837 NM109 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Name', db:'cl_billname', table:'claim', edi:'837 NM103 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Address', db:'cl_billaddr1', table:'claim', edi:'837 N3 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Address 2', db:'cl_billaddr2', table:'claim', edi:'837 N3 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider City', db:'cl_billcity', table:'claim', edi:'837 N4 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider State', db:'cl_billstate', table:'claim', edi:'837 N4 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Zip', db:'cl_billzip', table:'claim', edi:'837 N4 (85)' },
+  { cat:'Network', extract:'Network Name', db:'cl_networkname', table:'claim', edi:'Payer/TPA' },
+  { cat:'Network', extract:'Network Status', db:'cl_networkstatus', table:'claim', edi:'Payer/TPA' },
+  { cat:'Member / Patient', extract:'Employee/Subscriber ID/SSN', db:'cl_memid', table:'claim', edi:'837 NM109 (IL)' },
+  { cat:'Member / Patient', extract:'Subscriber First Name', db:'cl_eefn', table:'claim', edi:'837 NM104 (IL)' },
+  { cat:'Member / Patient', extract:'Subscriber Last Name', db:'cl_eeln', table:'claim', edi:'837 NM103 (IL)' },
+  { cat:'Member / Patient', extract:'Patient First Name', db:'cl_ptfn', table:'claim', edi:'837 NM104 (QC)' },
+  { cat:'Member / Patient', extract:'Patient Last Name', db:'cl_ptln', table:'claim', edi:'837 NM103 (QC)' },
+  { cat:'Member / Patient', extract:'Patient DOB', db:'cl_ptdob', table:'claim', edi:'837 DMG02 (QC)' },
+  { cat:'Member / Patient', extract:'Patient Gender', db:'cl_ptgender', table:'claim', edi:'837 DMG03 (QC)' },
+  { cat:'Member / Patient', extract:'Patient/Dependent Number', db:'cl_depno', table:'claim', edi:'Payer/TPA' },
+  { cat:'Member / Patient', extract:'Patient Relationship Code', db:'cl_ptrelcode', table:'claim', edi:'837 SBR02' },
+  { cat:'Enrollment', extract:'Group Number', db:'cl_groupno', table:'claim', edi:'837 SBR03' },
+  { cat:'Enrollment', extract:'Coverage Effective Date', db:'cl_coveffdt', table:'claim', edi:'834 DTP (348)' },
+  { cat:'Enrollment', extract:'Coverage Termination Date', db:'cl_covtermdt', table:'claim', edi:'834 DTP (349)' },
+  { cat:'Address - Subscriber', extract:'Subscriber Address', db:'cl_eeaddr1', table:'claim', edi:'837 N3 (IL)' },
+  { cat:'Address - Subscriber', extract:'Subscriber City', db:'cl_eecity', table:'claim', edi:'837 N4 (IL)' },
+  { cat:'Address - Subscriber', extract:'Subscriber State', db:'cl_eestate', table:'claim', edi:'837 N4 (IL)' },
+  { cat:'Address - Subscriber', extract:'Subscriber Zip Code', db:'cl_eezip', table:'claim', edi:'837 N4 (IL)' },
+  { cat:'Address - Patient', extract:'Patient Address', db:'cl_ptaddr1', table:'claim', edi:'837 N3 (QC)' },
+  { cat:'Address - Patient', extract:'Patient City', db:'cl_ptcity', table:'claim', edi:'837 N4 (QC)' },
+  { cat:'Address - Patient', extract:'Patient State', db:'cl_ptstate', table:'claim', edi:'837 N4 (QC)' },
+  { cat:'Address - Patient', extract:'Patient Zip Code', db:'cl_ptzip', table:'claim', edi:'837 N4 (QC)' },
+];
+
+const CATEGORY_COLORS = {
+  'Core': 'badge-core',
+  'Pre-Pay': 'badge-prepay',
+  'Post-Pay': 'badge-postpay',
+  'Financial': 'badge-financial',
+  'Date & Time': 'badge-datetime',
+  'Field Profiler': 'badge-profiler',
+  'Validation': 'badge-validation',
+};
+
+const CATEGORY_META = [
+  { cat:'Core',          icon:'🔑', count:7,  desc:'Fundamental claim KPIs — always required' },
+  { cat:'Pre-Pay',       icon:'🛡️', count:5,  desc:'Pre-payment review savings & rates' },
+  { cat:'Post-Pay',      icon:'💰', count:5,  desc:'Overpayment recovery tracking' },
+  { cat:'Financial',     icon:'📊', count:6,  desc:'Cost analytics & trend calculations' },
+  { cat:'Date & Time',   icon:'📅', count:4,  desc:'Time-series & date intelligence' },
+  { cat:'Field Profiler',icon:'🔬', count:8,  desc:'Data completeness & profile metrics' },
+  { cat:'MV Rules',      icon:'✅', count:10, desc:'Pre & Post Mapping validation rules' },
+];
+
+// ============================================================
+// CHARTS
+// ============================================================
+function CategoryChart({ metrics }) {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const cats = {};
+    metrics.forEach(m => { cats[m.category] = (cats[m.category] || 0) + 1; });
+    const labels = Object.keys(cats);
+    const data = Object.values(cats);
+    const colors = ['#77256C','#28B296','#EC4273','#FBB75E','#439BCB','#945F8D','#FAAF4C'];
+    if (chartRef.current) chartRef.current.destroy();
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '55%',
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#4a5568', font: { family: 'DM Sans', size: 11 }, padding: 14, usePointStyle: true, pointStyleWidth: 8 } }
+        }
+      }
+    });
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
+  }, []);
+  return <canvas ref={canvasRef} />;
+}
+
+function FieldCategoryChart() {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const cats = {};
+    FIELD_REFERENCE.forEach(f => { cats[f.cat] = (cats[f.cat] || 0) + 1; });
+    const sorted = Object.entries(cats).sort((a,b) => b[1]-a[1]);
+    const labels = sorted.map(([k]) => k.length > 22 ? k.slice(0,20)+'…' : k);
+    const data = sorted.map(([,v]) => v);
+    if (chartRef.current) chartRef.current.destroy();
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ data, backgroundColor: '#77256C', borderRadius: 4, borderSkipped: false, barPercentage: 0.65 }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.parsed.x} fields` } } },
+        scales: {
+          x: { ticks: { color: '#6b6185', font: { size: 10, family: 'DM Sans' } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          y: { ticks: { color: '#6b6185', font: { size: 10, family: 'DM Sans' } }, grid: { display: false } }
+        }
+      }
+    });
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
+  }, []);
+  return <canvas ref={canvasRef} />;
+}
+
+// ============================================================
+// SORT ARROW
+// ============================================================
+function SortArrow({ col, sortCol, sortDir }) {
+  const active = sortCol === col;
+  return <span className={`sort-arrow ${active ? 'active' : ''}`}>{active ? (sortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>;
+}
+
+// ============================================================
+// OVERVIEW TAB
+// ============================================================
+// Helper: profile every column in the loaded file
+function profileColumns(headers, rows) {
+  const hLen = headers.length;
+  const total = rows.length;
+  const filled    = new Int32Array(hLen);
+  const numCount  = new Int32Array(hLen);
+  const dateCount = new Int32Array(hLen);
+  const distinct  = headers.map(() => new Set());
+  // Type detection on a sample to keep it fast for large files
+  const SAMPLE = Math.min(total, 5000);
+  const numRx  = /^-?[\d,$.]+$/;
+  const dateRx = /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|^\d{4}-\d{2}-\d{2}/;
+  // Single pass — all columns at once
+  for (let i = 0; i < total; i++) {
+    const row = rows[i];
+    for (let j = 0; j < hLen; j++) {
+      const val = row[headers[j]];
+      if (val && val !== '') {
+        filled[j]++;
+        if (distinct[j].size < 10000) distinct[j].add(val);
+        if (i < SAMPLE) {
+          if (numRx.test(val)) numCount[j]++;
+          else if (dateRx.test(val)) dateCount[j]++;
+        }
+      }
+    }
+  }
+  return headers.map((col, j) => {
+    const f = filled[j];
+    const pctFilled = total > 0 ? f / total : 0;
+    let dataType = 'Text';
+    if (f === 0) dataType = 'Empty';
+    else if (numCount[j] / Math.min(f, SAMPLE) >= 0.8) dataType = 'Numeric';
+    else if (dateCount[j] / Math.min(f, SAMPLE) >= 0.7) dataType = 'Date';
+    else if (numCount[j] / Math.min(f, SAMPLE) >= 0.3) dataType = 'Mixed';
+    return { column: col, count: total, filledCount: f, nullCount: total - f,
+             pctFilled, pctEmpty: 1 - pctFilled, distinctCount: distinct[j].size, dataType };
+  });
+}
+
+function DataCompletenessChart({ profiles }) {
+  const canvasRef = useRef(null);
+  const chartRef  = useRef(null);
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const sorted = [...profiles].sort((a, b) => b.pctEmpty - a.pctEmpty).slice(0, 20);
+    const labels = sorted.map(p => p.column.length > 22 ? p.column.slice(0, 20) + '…' : p.column);
+    const data   = sorted.map(p => (p.pctEmpty * 100).toFixed(1));
+    const colors = sorted.map(p => p.pctEmpty >= 0.5 ? '#EC4273' : p.pctEmpty >= 0.1 ? '#FAAF4C' : '#28B296');
+    if (chartRef.current) chartRef.current.destroy();
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'bar',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, borderSkipped: false, barPercentage: 0.7 }] },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.parsed.x}% empty` } } },
+        scales: {
+          x: { max: 100, ticks: { callback: v => v + '%', color: '#6b6185', font: { size: 10, family: 'DM Sans' } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          y: { ticks: { color: '#6b6185', font: { size: 10, family: 'DM Sans' } }, grid: { display: false } }
+        }
+      }
+    });
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
+  }, [profiles]);
+  return <canvas ref={canvasRef} />;
+}
+
+function DataTypeDonut({ profiles }) {
+  const canvasRef = useRef(null);
+  const chartRef  = useRef(null);
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const counts = {};
+    profiles.forEach(p => { counts[p.dataType] = (counts[p.dataType] || 0) + 1; });
+    const labels = Object.keys(counts);
+    const data   = Object.values(counts);
+    const palette = { Numeric:'#28B296', Text:'#77256C', Date:'#439BCB', Mixed:'#FAAF4C', Empty:'#EC4273' };
+    const colors  = labels.map(l => palette[l] || '#945F8D');
+    if (chartRef.current) chartRef.current.destroy();
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '55%',
+        plugins: { legend: { position: 'bottom', labels: { color: '#4a5568', font: { family: 'DM Sans', size: 11 }, padding: 14, usePointStyle: true, pointStyleWidth: 8 } } } }
+    });
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
+  }, [profiles]);
+  return <canvas ref={canvasRef} />;
+}
+
+function Overview({ onNav, fileData, onLoad }) {
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef(null);
+  const DELIM_LABELS = { ',': 'comma', '\t': 'tab', '|': 'pipe', ';': 'semicolon' };
+  const [loadStatus, setLoadStatus] = useState(null); // null | { done, total, currentName, phase }
+
+  const handleFiles = useCallback((fileList) => {
+    if (!fileList || fileList.length === 0) return;
+    const files = Array.from(fileList).filter(f => /\.(csv|tsv|txt)$/i.test(f.name));
+    if (files.length === 0) return;
+
+    const results = new Array(files.length);
+    let done = 0;
+    setLoadStatus({ done: 0, total: files.length, currentName: files[0].name, phase: 'reading' });
+
+    files.forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        results[idx] = e.target.result;
+        done++;
+        if (done < files.length) {
+          setLoadStatus({ done, total: files.length, currentName: files[done]?.name || '', phase: 'reading' });
+          return;
+        }
+
+        // Parse each file in async chunks — never blocks the browser.
+        let firstParsed = null; // first successfully parsed file (gives us headers + delim)
+        let allRows = [];
+        let fileIdx = 0;
+
+        const parseNextFile = () => {
+          if (fileIdx >= results.length) {
+            setLoadStatus(null);
+            if (!firstParsed) {
+              alert('No data could be read from the selected files.\n\nMake sure they are plain-text CSV/TSV/TXT files and try again.');
+              return;
+            }
+            const name = files.length === 1 ? files[0].name : `${files.length} files combined`;
+            onLoad({ headers: firstParsed.headers, rows: allRows, delim: firstParsed.delim }, name, files.map(f => f.name));
+            return;
+          }
+          const fi = fileIdx;
+          setLoadStatus({ fileIdx: fi, total: files.length, currentName: files[fi].name, phase: 'parsing', rowsDone: 0, rowsTotal: 1 });
+          parseCSVChunked(
+            results[fi],
+            (rowsDone, rowsTotal) => {
+              setLoadStatus({ fileIdx: fi, total: files.length, currentName: files[fi].name, phase: 'parsing', rowsDone, rowsTotal });
+            },
+            (parsed) => {
+              if (parsed && parsed.headers.length) {
+                if (!firstParsed) {
+                  // first good file — use its headers and delimiter
+                  firstParsed = parsed;
+                  allRows = parsed.rows.slice();
+                } else {
+                  // subsequent files — append rows only
+                  const pr = parsed.rows;
+                  for (let j = 0; j < pr.length; j++) allRows.push(pr[j]);
+                }
+              }
+              fileIdx++;
+              parseNextFile();
+            }
+          );
+        };
+        parseNextFile();
+      };
+      reader.readAsText(file);
+    });
+  }, [onLoad]);
+
+  const profiles = useMemo(() =>
+    fileData.rows.length ? profileColumns(fileData.headers, fileData.rows) : []
+  , [fileData.headers, fileData.rows]);
+
+  const dataStats = useMemo(() => {
+    if (!profiles.length) return null;
+    const complete = profiles.filter(p => p.pctFilled >= 0.99).length;
+    const partial  = profiles.filter(p => p.pctFilled >= 0.5 && p.pctFilled < 0.99).length;
+    const sparse   = profiles.filter(p => p.pctFilled > 0 && p.pctFilled < 0.5).length;
+    const empty    = profiles.filter(p => p.pctFilled === 0).length;
+    const totalCells  = profiles.reduce((s, p) => s + p.count, 0);
+    const filledCells = profiles.reduce((s, p) => s + p.filledCount, 0);
+    const weightedPct = totalCells > 0 ? filledCells / totalCells : 0;
+    const numericCols = profiles.filter(p => p.dataType === 'Numeric');
+    return { complete, partial, sparse, empty, weightedPct, numericCols };
+  }, [profiles]);
+
+  const numericTotals = useMemo(() => {
+    if (!dataStats) return [];
+    return dataStats.numericCols.slice(0, 8).map(p => {
+      let total = 0, count = 0, min = Infinity, max = -Infinity;
+      fileData.rows.forEach(row => {
+        const n = parseFloat(String(row[p.column] ?? '').replace(/[$,\s]/g, ''));
+        if (!isNaN(n)) { total += n; count++; if (n < min) min = n; if (n > max) max = n; }
+      });
+      return { col: p.column, total, avg: count > 0 ? total / count : 0, min: count > 0 ? min : 0, max: count > 0 ? max : 0, count };
+    });
+  }, [dataStats, fileData.rows]);
+
+  const fmtN = n => n == null ? '—' : Math.abs(n) >= 1e6
+    ? '$' + (n / 1e6).toFixed(2) + 'M'
+    : '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const hasFile = fileData.headers.length > 0;
+
+  return (
+    <div>
+      {/* ── LOADING PROGRESS ── */}
+      {loadStatus && (
+        <div style={{
+          background:'var(--bg-card)', border:'1px solid var(--border-color)',
+          borderRadius:'var(--radius-lg)', padding:'2rem 2.5rem',
+          marginBottom:'1.25rem', boxShadow:'var(--shadow-sm)',
+          display:'flex', flexDirection:'column', alignItems:'center', gap:'1rem'
+        }}>
+          <div style={{fontSize:'0.95rem',fontWeight:700,color:'var(--text-main)'}}>
+            {loadStatus.phase === 'parsing'
+              ? `Parsing file ${(loadStatus.fileIdx || 0) + 1} of ${loadStatus.total} — ${loadStatus.currentName}`
+              : `Reading file ${(loadStatus.done || 0) + 1} of ${loadStatus.total}…`}
+          </div>
+          {loadStatus.currentName && (
+            <div style={{fontSize:'0.75rem',color:'var(--text-muted)',fontFamily:'var(--font-mono)'}}>{loadStatus.currentName}</div>
+          )}
+          {/* progress bar */}
+          <div style={{width:'100%',maxWidth:480,height:8,background:'var(--border-color)',borderRadius:4,overflow:'hidden'}}>
+            <div style={{
+              height:'100%', borderRadius:4,
+              background:'linear-gradient(90deg, var(--primary), var(--primary-light))',
+              transition:'width 0.2s ease',
+              width: loadStatus.phase === 'parsing' && loadStatus.rowsTotal > 0
+                ? `${Math.round(((loadStatus.fileIdx + loadStatus.rowsDone / loadStatus.rowsTotal) / loadStatus.total) * 100)}%`
+                : `${Math.round(((loadStatus.done || 0) / loadStatus.total) * 100)}%`
+            }} />
+          </div>
+          <div style={{fontSize:'0.72rem',color:'var(--text-muted)'}}>
+            {loadStatus.phase === 'parsing'
+              ? `${(loadStatus.rowsDone || 0).toLocaleString()} of ~${(loadStatus.rowsTotal || 0).toLocaleString()} rows · file ${(loadStatus.fileIdx || 0) + 1} of ${loadStatus.total}`
+              : `${loadStatus.done || 0} of ${loadStatus.total} file${loadStatus.total > 1 ? 's' : ''} read`}
+          </div>
+        </div>
+      )}
+
+      {/* ── UPLOAD ZONE ── */}
+      {!loadStatus && !hasFile && (
+        <div
+          className={`explorer-drop-zone fade-up ${dragOver ? 'drag-over' : ''}`}
+          style={{marginBottom:'1.25rem'}}
+          onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
+          onClick={() => fileRef.current && fileRef.current.click()}
+        >
+          <div className="drop-icon">📂</div>
+          <div className="drop-title">Load one or more data files to begin</div>
+          <div className="drop-sub">CSV · TSV · TXT — select or drop multiple files to combine · delimiter auto-detected · stays local, nothing uploaded</div>
+          <input ref={fileRef} type="file" accept=".csv,.tsv,.txt" multiple style={{display:'none'}} onChange={e => handleFiles(e.target.files)} />
+        </div>
+      )}
+
+      {/* ── FILE LOADED — computed stats ── */}
+      {!loadStatus && hasFile && (
+        <div className="fade-up">
+          {/* file info bar */}
+          <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom: fileData.fileNames && fileData.fileNames.length > 1 ? '0.4rem' : '0.85rem',flexWrap:'wrap'}}>
+            <span style={{fontSize:'0.88rem',fontWeight:700,color:'var(--text-main)'}}>{fileData.fileName}</span>
+            <span style={{fontSize:'0.78rem',color:'var(--text-muted)'}}>{fileData.rows.length.toLocaleString()} rows · {fileData.headers.length} columns · <span style={{color:'var(--primary)',fontWeight:600}}>{DELIM_LABELS[fileData.delim] || fileData.delim}-delimited</span></span>
+            <button className="file-clear-btn" style={{marginLeft:'auto'}} onClick={() => onLoad(null, '')}>✕ Clear</button>
+            <button className="sort-toggle-btn" onClick={() => fileRef.current && fileRef.current.click()}>📂 Replace / Add files</button>
+            <input ref={fileRef} type="file" accept=".csv,.tsv,.txt" multiple style={{display:'none'}} onChange={e => handleFiles(e.target.files)} />
+          </div>
+
+          {/* multi-file list */}
+          {fileData.fileNames && fileData.fileNames.length > 1 && (
+            <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap',marginBottom:'0.85rem',alignItems:'center'}}>
+              <span style={{fontSize:'0.68rem',fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.04em'}}>Files loaded:</span>
+              {fileData.fileNames.map((n, i) => (
+                <span key={i} style={{fontSize:'0.7rem',padding:'2px 8px',borderRadius:'20px',background:'var(--primary-faint)',color:'var(--primary)',fontFamily:'var(--font-mono)',fontWeight:500}}>{n}</span>
+              ))}
+            </div>
+          )}
+
+          {/* computed stat cards */}
+          <div className="stats-row" style={{marginBottom:'1rem'}}>
+            <div className="stat-card hero">
+              <div className="stat-label">Overall Completeness</div>
+              <div className="stat-value">{(dataStats.weightedPct * 100).toFixed(1)}%</div>
+              <div className="stat-sub">Weighted across all {fileData.headers.length} columns</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Total Rows</div>
+              <div className="stat-value">{fileData.rows.length.toLocaleString()}</div>
+              <div className="stat-sub">{fileData.headers.length} columns profiled</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label" style={{color:'var(--success)'}}>Complete Cols</div>
+              <div className="stat-value" style={{color:'var(--success)'}}>{dataStats.complete}</div>
+              <div className="stat-sub">≥99% filled</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label" style={{color:'var(--warning)'}}>Partial Cols</div>
+              <div className="stat-value" style={{color:'var(--warning)'}}>{dataStats.partial}</div>
+              <div className="stat-sub">50–99% filled</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label" style={{color:'var(--danger)'}}>Sparse / Empty</div>
+              <div className="stat-value" style={{color:'var(--danger)'}}>{dataStats.sparse + dataStats.empty}</div>
+              <div className="stat-sub">{dataStats.empty} fully empty · {dataStats.sparse} sparse</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Numeric Cols</div>
+              <div className="stat-value" style={{color:'var(--info)'}}>{dataStats.numericCols.length}</div>
+              <div className="stat-sub">Auto-detected from values</div>
+            </div>
+          </div>
+
+          {/* charts */}
+          <div className="chart-row" style={{marginBottom:'1rem'}}>
+            <div className="chart-box">
+              <h3>Top 20 Emptiest Columns</h3>
+              <div className="chart-wrap"><DataCompletenessChart profiles={profiles} /></div>
+            </div>
+            <div className="chart-box">
+              <h3>Data Type Distribution</h3>
+              <div className="chart-wrap"><DataTypeDonut profiles={profiles} /></div>
+            </div>
+          </div>
+
+          {/* numeric totals */}
+          {numericTotals.length > 0 && (
+            <div className="card" style={{marginBottom:'1rem'}}>
+              <div className="card-title">Numeric Column Totals <span className="card-subtitle">Auto-detected numeric columns</span></div>
+              <table className="metrics-table">
+                <thead><tr><th>Column</th><th>Total</th><th>Average</th><th>Min</th><th>Max</th><th>Numeric Rows</th></tr></thead>
+                <tbody>
+                  {numericTotals.map(t => (
+                    <tr key={t.col}>
+                      <td><span className="mono">{t.col}</span></td>
+                      <td style={{fontWeight:700,color:'var(--primary)'}}>{fmtN(t.total)}</td>
+                      <td>{fmtN(t.avg)}</td>
+                      <td>{fmtN(t.min)}</td>
+                      <td>{fmtN(t.max)}</td>
+                      <td>{t.count.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* all columns completeness */}
+          <div className="card">
+            <div className="card-title">Column Completeness <span className="card-subtitle">{profiles.length} columns · use Field Mapper to explore column values</span></div>
+            <table className="metrics-table">
+              <thead><tr><th>Column</th><th>Type</th><th>Filled</th><th>Empty</th><th>Distinct</th><th>Completeness</th></tr></thead>
+              <tbody>
+                {[...profiles].sort((a,b) => a.pctFilled - b.pctFilled).map(p => (
+                  <tr key={p.column}>
+                    <td><span className="mono">{p.column}</span></td>
+                    <td><span className={`badge ${p.dataType==='Numeric'?'badge-prepay':p.dataType==='Date'?'badge-datetime':p.dataType==='Empty'?'badge-fail':'badge-core'}`}>{p.dataType}</span></td>
+                    <td style={{color:'var(--success)'}}>{p.filledCount.toLocaleString()}</td>
+                    <td style={{color: p.nullCount > 0 ? 'var(--danger)' : 'var(--success)'}}>{p.nullCount.toLocaleString()}</td>
+                    <td style={{color:'var(--info)'}}>{p.distinctCount.toLocaleString()}</td>
+                    <td>
+                      <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
+                        <div style={{width:80,height:6,borderRadius:3,background:'var(--border-color)',overflow:'hidden',flexShrink:0}}>
+                          <div style={{width:`${p.pctFilled*100}%`,height:'100%',borderRadius:3,background: p.pctFilled>=0.9?'var(--success)':p.pctFilled>=0.5?'var(--warning)':'var(--danger)'}} />
+                        </div>
+                        <span style={{fontSize:'0.75rem',fontWeight:700,color: p.pctFilled>=0.9?'var(--success)':p.pctFilled>=0.5?'var(--warning)':'var(--danger)'}}>{(p.pctFilled*100).toFixed(1)}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── STATIC REFERENCE CONTENT (always shown) ── */}
+      <div className="stats-row fade-up fade-up-d1" style={{marginTop: hasFile ? '1.5rem' : 0}}>
+        <div className="stat-card hero">
+          <div className="stat-label">Total Metrics</div>
+          <div className="stat-value">{METRICS.length}</div>
+          <div className="stat-sub">Documented in CI_Calculations v3.2</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Categories</div>
+          <div className="stat-value">6</div>
+          <div className="stat-sub">Core · Pre-Pay · Post-Pay · Financial · Date · Profiler</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Source Fields Mapped</div>
+          <div className="stat-value">{FIELD_REFERENCE.length}</div>
+          <div className="stat-sub">Across 15 functional categories</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Validation Rules</div>
+          <div className="stat-value">{MV_RULES.length}</div>
+          <div className="stat-sub">Pre & Post Mapping (MV-1 – MV-10)</div>
+        </div>
+      </div>
+
+      <div className="cat-summary-grid fade-up fade-up-d2">
+        {CATEGORY_META.map(c => (
+          <div className="cat-summary-card" key={c.cat}>
+            <div className="cat-icon" style={{background:'var(--primary-faint)'}}>{c.icon}</div>
+            <div className="cat-text">
+              <div className="cat-title">{c.cat}</div>
+              <div className="cat-count">{c.count} metrics</div>
+              <div className="bar-mini"><div className="bar-mini-fill" style={{width:`${Math.min(c.count/10*100,100)}%`}} /></div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="chart-row fade-up fade-up-d3">
+        <div className="chart-box">
+          <h3>Metrics by Category</h3>
+          <div className="chart-wrap"><CategoryChart metrics={METRICS} /></div>
+        </div>
+        <div className="chart-box">
+          <h3>Source Fields by Category (93 fields)</h3>
+          <div className="chart-wrap"><FieldCategoryChart /></div>
+        </div>
+      </div>
+
+      <div className="card fade-up fade-up-d4">
+        <div className="card-title">Source Reference Documents</div>
+        <table className="metrics-table">
+          <thead><tr><th>Document</th><th>Version</th><th>Purpose</th><th>Last Updated</th></tr></thead>
+          <tbody>
+            <tr><td>CI_Calculations_v3_2.md</td><td><span className="badge badge-pass">v3.2</span></td><td>Unified SQL, DAX & Power BI metric definitions</td><td>March 2026</td></tr>
+            <tr><td>Pre_Post_Mapping_Validation_Documentation_v2_0.docx</td><td><span className="badge badge-pass">v2.0</span></td><td>Pre & Post Mapping validation methodology</td><td>March 2026</td></tr>
+            <tr><td>Pre_Post_Mapping_Validation_Portal_v2_0.html</td><td><span className="badge badge-pass">v2.0</span></td><td>Interactive field profiler portal (37,169 rows × 93 cols)</td><td>2026-03-16</td></tr>
+          </tbody>
+        </table>
+        <div style={{marginTop:'1rem',padding:'0.75rem 1rem',background:'var(--primary-faint)',borderRadius:'var(--radius-sm)',fontSize:'0.78rem',color:'var(--text-muted)'}}>
+          <strong style={{color:'var(--primary)'}}>Standard Filter:</strong>&nbsp;
+          <code style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem'}}>COALESCE(cl_ci_ignore, 0) = 0 AND COALESCE(ln_ci_ignore, 0) = 0</code>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// LIVE METRICS — computable core metrics from loaded file
+// ============================================================
+const COMPUTABLE_METRICS = [
+  { id:'CM-1', name:'Employees',        icon:'👥', label:'Member / Employee ID col', type:'distinct',  hint:'e.g. MEMID, EE_ID, SUBSCRIBER_ID' },
+  { id:'CM-2', name:'Patients',         icon:'🏥', label:'Patient ID col',           type:'distinct',  hint:'e.g. PTID, PATIENT_ID' },
+  { id:'CM-3', name:'Claim Count',      icon:'📋', label:'Claim ID col',             type:'distinct',  hint:'e.g. CLAIM_NBR, CLM_ID' },
+  { id:'CM-4', name:'Claimline Count',  icon:'📄', label:'Auto — total row count',   type:'rowcount',  hint:'No column needed' },
+  { id:'CM-5', name:'Total Paid',       icon:'💰', label:'Paid amount col',          type:'sum',       hint:'e.g. PAID_AMT, AMOUNT_PAID', isCurrency:true },
+  { id:'CM-6', name:'Scope Begin Date', icon:'📅', label:'Paid date col',            type:'min_date',  hint:'e.g. PAID_DT, PAYMENT_DATE' },
+  { id:'CM-7', name:'Scope End Date',   icon:'📅', label:'Paid date col',            type:'max_date',  hint:'e.g. PAID_DT, PAYMENT_DATE' },
+];
+
+function autoDetect(headers, id) {
+  const find = pats => headers.find(h => pats.some(p => p.test(h.toLowerCase()))) || '';
+  switch (id) {
+    case 'CM-1': return find([/mem.*id|ee_id|subscr.*id|member_id|empl.*id|employee_id/]);
+    case 'CM-2': return find([/pt.*id|patient.*id|pat.*id/]);
+    case 'CM-3': return find([/claim.*(?:id|no|num|nbr)|clm_id|claimid|claim_number/]);
+    case 'CM-5': return find([/paid.*amt|amt.*paid|amount.*paid|paid_amount|paid_amnt/]);
+    case 'CM-6':
+    case 'CM-7': return find([/paid.*dt|dt.*paid|paid.*date|payment.*date|pay.*date/]);
+    default: return '';
+  }
+}
+
+function LiveMetrics({ fileData, mappings, setMappings }) {
+  const { headers, rows, fileName } = fileData;
+
+  // Auto-detect columns on new file load
+  useEffect(() => {
+    if (!headers.length) return;
+    setMappings(prev => {
+      const next = { ...prev };
+      COMPUTABLE_METRICS.forEach(m => {
+        if (m.type !== 'rowcount' && !next[m.id])
+          next[m.id] = autoDetect(headers, m.id);
+      });
+      return next;
+    });
+  }, [headers]);
+
+  const results = useMemo(() => {
+    if (!rows.length) return {};
+    const r = {};
+    COMPUTABLE_METRICS.forEach(m => {
+      const col = mappings[m.id] || '';
+      if (m.type === 'rowcount') {
+        r[m.id] = rows.length;
+      } else if (!col) {
+        r[m.id] = null;
+      } else if (m.type === 'distinct') {
+        const s = new Set();
+        rows.forEach(row => { const v = String(row[col] ?? '').trim(); if (v) s.add(v); });
+        r[m.id] = s.size;
+      } else if (m.type === 'sum') {
+        let total = 0;
+        rows.forEach(row => {
+          const n = parseFloat(String(row[col] ?? '').replace(/[$,\s]/g, ''));
+          if (!isNaN(n)) total += n;
+        });
+        r[m.id] = total;
+      } else if (m.type === 'min_date' || m.type === 'max_date') {
+        let extreme = null;
+        rows.forEach(row => {
+          const v = String(row[col] ?? '').trim();
+          if (!v) return;
+          let d = new Date(v);
+          // Try YYYYMMDD (no separators)
+          if (isNaN(d) && /^\d{8}$/.test(v))
+            d = new Date(`${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`);
+          // Try MM/DD/YYYY or M/D/YYYY
+          if (isNaN(d) && /^\d{1,2}\/\d{1,2}\/\d{4}/.test(v)) {
+            const [mo,dy,yr] = v.split('/');
+            d = new Date(`${yr}-${mo.padStart(2,'0')}-${dy.padStart(2,'0')}`);
+          }
+          if (isNaN(d)) return;
+          if (!extreme || (m.type === 'min_date' ? d < extreme : d > extreme)) extreme = d;
+        });
+        r[m.id] = extreme
+          ? extreme.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
+          : null;
+      }
+    });
+    return r;
+  }, [rows, mappings]);
+
+  const fmtVal = (m, val) => {
+    if (val === null || val === undefined) return null;
+    if (m.isCurrency) {
+      const n = Number(val);
+      if (Math.abs(n) >= 1e9) return '$' + (n/1e9).toFixed(3) + 'B';
+      if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+      if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K';
+      return '$' + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+    }
+    if (typeof val === 'number') return val.toLocaleString('en-US');
+    return String(val);
+  };
+
+  if (!headers.length) {
+    return (
+      <div style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',borderRadius:'var(--radius-lg)',padding:'1.5rem',marginBottom:'1rem',textAlign:'center',boxShadow:'var(--shadow-xs)'}}>
+        <div style={{fontSize:'1.5rem',marginBottom:'0.4rem'}}>📂</div>
+        <div style={{fontWeight:700,color:'var(--text-muted)',marginBottom:'0.25rem'}}>No file loaded</div>
+        <div style={{fontSize:'0.78rem',color:'var(--text-light)'}}>Go to the <strong>Overview</strong> tab to load a CSV, TSV, or TXT file — metrics will compute automatically.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',borderRadius:'var(--radius-lg)',padding:'1.1rem 1.25rem',marginBottom:'1rem',boxShadow:'var(--shadow-sm)'}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem',flexWrap:'wrap',gap:'0.5rem'}}>
+        <div>
+          <span style={{fontSize:'0.95rem',fontWeight:700}}>Live Metric Results</span>
+          <span style={{fontSize:'0.72rem',color:'var(--text-muted)',marginLeft:'0.75rem'}}>Computed from <strong>{fileName}</strong> · {rows.length.toLocaleString()} rows · select the matching column for each metric</span>
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(195px,1fr))',gap:'0.75rem'}}>
+        {COMPUTABLE_METRICS.map(m => {
+          const raw  = results[m.id];
+          const disp = fmtVal(m, raw);
+          const has  = disp !== null;
+          const col  = mappings[m.id] || '';
+          return (
+            <div key={m.id} style={{
+              background: has ? 'var(--primary-faint)' : 'var(--bg-main)',
+              border:`1px solid ${has ? 'rgba(119,37,108,0.2)' : 'var(--border-color)'}`,
+              borderRadius:'var(--radius-md)', padding:'0.85rem 1rem',
+              display:'flex', flexDirection:'column', gap:'0.35rem', transition:'border-color 0.2s'
+            }}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                <span className="mono" style={{fontSize:'0.65rem',fontWeight:700,color:'var(--primary)',background:'var(--primary-faint)',padding:'2px 6px',borderRadius:'4px'}}>{m.id}</span>
+                <span style={{fontSize:'1rem'}}>{m.icon}</span>
+              </div>
+              <div style={{fontSize:'0.8rem',fontWeight:700,color:'var(--text-main)'}}>{m.name}</div>
+              {m.type === 'min_date' && <div style={{fontSize:'0.64rem',color:'var(--text-light)',fontStyle:'italic'}}>Earliest date in column</div>}
+              {m.type === 'max_date' && <div style={{fontSize:'0.64rem',color:'var(--text-light)',fontStyle:'italic'}}>Latest date in column</div>}
+              {m.type === 'rowcount' ? (
+                <div style={{fontSize:'0.68rem',color:'var(--text-light)',fontStyle:'italic',minHeight:26,display:'flex',alignItems:'center'}}>Auto — counts all rows</div>
+              ) : (
+                <select className="filter-select" style={{fontSize:'0.72rem',padding:'3px 6px',width:'100%'}}
+                  value={col} onChange={e => setMappings(p => ({ ...p, [m.id]: e.target.value }))}>
+                  <option value="">— select column —</option>
+                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                </select>
+              )}
+              <div style={{fontSize: has ? '1.45rem' : '1.1rem', fontWeight:800,
+                color: has ? 'var(--primary)' : 'var(--text-light)', letterSpacing:'-0.02em', marginTop:'0.1rem'}}>
+                {has ? disp : '—'}
+              </div>
+              {col && m.type !== 'rowcount' && (
+                <div style={{fontSize:'0.65rem',color:'var(--text-light)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} title={col}>↳ {col}</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// METRICS CATALOG TAB
+// ============================================================
+function MetricsCatalog({ fileData, metricMappings, setMetricMappings }) {
+  return <LiveMetrics fileData={fileData} mappings={metricMappings} setMappings={setMetricMappings} />;
+}
+
+// ============================================================
+// CI FIELD LIST — from Final_Mapping_Fields.csv
+// ============================================================
+const CI_FIELDS = [
+  'Accident State','Additional Codes','Admission Date','Admission Hour','Admitting Diagnosis',
+  'Allowed Amount','Anesthesia Minutes','Assignment of Benefits','Attending Physician Name',
+  'Attending Physician NPI','Auto Adjudicated / Manual Flag','Billed / Charged Amount',
+  'Billing Provider (Group) Name','Billing Provider Address','Billing Provider Address 2',
+  'Billing Provider City','Billing Provider Fax','Billing Provider Federal Tax ID Number',
+  'Billing Provider Federal Tax ID suffix','Billing Provider First Name','Billing Provider Last Name',
+  'Billing Provider National Provider Identifier','Billing Provider Phone','Billing Provider State',
+  'Billing Provider Zip','Check Number / EFT Number','Claim Line Number','Claim Number',
+  'Claim Paid Date','Claim Processed Date','Claim Received Date','Claim Status Code','Claim Type',
+  'CMS Diagnosis Pointer','COB Allowed Amount','COB Amount','COB Indicator','Coinsurance Amount',
+  'Condition Codes','Copay Amount','Coverage Effective Date','Coverage Termination Date',
+  'CPT / HCPCS / HIPPS Code (Facility)','CPT / HCPCS Code (Professional)',
+  'Date of Death','Date of Onset','Deductible Amount',
+  'Diagnosis 1','Diagnosis 2','Diagnosis 3','Diagnosis 4','Diagnosis 5',
+  'Diagnosis 6','Diagnosis 7','Diagnosis 8','Diagnosis 9','Diagnosis 10',
+  'Discharge Date','Discharge Hour','DRG Code','DRG SOI','DRG Version',
+  'Employee / Subscriber Address','Employee / Subscriber Address 2','Employee / Subscriber City',
+  'Employee / Subscriber Date of Birth','Employee / Subscriber First Name',
+  'Employee / Subscriber Gender','Employee / Subscriber ID','Employee / Subscriber Last Name',
+  'Employee / Subscriber State','Employee / Subscriber Zip Code',
+  'External Cause of Injury Code','From Date of Service (Professional)','Group Number',
+  'ICD-10-PCS Other Procedure 1 / Date','ICD-10-PCS Other Procedure 2 / Date',
+  'ICD-10-PCS Other Procedure 3 / Date','ICD-10-PCS Other Procedure 4 / Date',
+  'ICD-10-PCS Other Procedure 5 / Date','ICD-10-PCS-Principle Procedure / Date',
+  'ICN Number','ITS / SCCF Number','Medical Record Number','Medicare Indicator',
+  'Modifier 1','Modifier 2','Modifier 3','Modifier 4','NDC Number',
+  'Not Covered Amount (1) Not Covered','Not Covered Amount (2) Exclusion',
+  'Not Covered Amount (3) UCR','Not Covered Amount (4) Plan',
+  'Not Covered Reason Code 1','Not Covered Reason Code 2',
+  'Not Covered Reason Code 3','Not Covered Reason Code 4',
+  'Occurrence Codes','Occurrence Dates','Occurrence Span Codes','Occurrence Span Dates',
+  'Operating Physician Name','Operating Physician NPI',
+  'Other Provider Name and Identifiers- QUAL/NPI/QUAL/ID','Paid Amount',
+  'Patient Address','Patient Address 2','Patient Age','Patient City',
+  'Patient Control/Patient Account Number','Patient Discharge Status','Patient DOB',
+  'Patient First Name','Patient Gender','Patient ID','Patient Last Name',
+  'Patient Reason for Visit Code','Patient Relationship Code','Patient SSN',
+  'Patient State','Patient Telephone Number','Patient Zip Code','Patient/Dependent Number',
+  "Patient's Condition / Status",'Payee','Place of Service','Plan Number','Plan Number Suffix',
+  'POA Indicator 2','POA Indicator 3','POA Indicator 4','POA Indicator 5','POA Indicator Principal',
+  'Pre-Authorization/Prior Approval/Precertification',
+  'Referring Physician Name','Referring Physician NPI','Referring Physician Other ID','Remarks',
+  'Revenue Code','Service / Rendering Provider (Group) Name',
+  'Service / Rendering Provider Address','Service / Rendering Provider Address 2',
+  'Service / Rendering Provider City','Service / Rendering Provider Fax',
+  'Service / Rendering Provider Federal Tax ID suffix',
+  'Service / Rendering Provider First Name','Service / Rendering Provider Last Name',
+  'Service / Rendering Provider National Provider Identifier',
+  'Service / Rendering Provider Network Name','Service / Rendering Provider Network Status',
+  'Service / Rendering Provider Phone','Service / Rendering Provider Specialty Code',
+  'Service / Rendering Provider State','Service / Rendering Provider Taxonomy Code',
+  'Service / Rendering Provider Type Code','Service / Rendering Provider Zip',
+  'Service Provider / Rendering Federal Tax ID Number','Source of Admission',
+  'Statement Covers Period: From Date to (UB04)',
+  'Statement Covers Period: Through Date to discharge (UB04)',
+  'To Date of Service (Professional)','Treatment Authorization Codes',
+  'Type of Admission / Visit','Type of Bill','Type of Coverage','Type of Service',
+  'Units','Value Codes',
+];
+
+// ============================================================
+// FIELD MAPPER TAB
+// ============================================================
+function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
+  const { headers, rows } = fileData;
+  const [search,      setSearch]      = useState('');
+  const [draggedCol,  setDraggedCol]  = useState(null);
+  const [dropTarget,  setDropTarget]  = useState(null);
+  const [colFilter,   setColFilter]   = useState('all'); // all | mapped | unmapped
+  const [selectedCol, setSelectedCol] = useState(null);
+
+  const mappedSet    = useMemo(() => new Set(Object.values(fieldMappings).filter(Boolean)), [fieldMappings]);
+  const mappedCount  = useMemo(() => Object.values(fieldMappings).filter(Boolean).length, [fieldMappings]);
+
+  const filteredFields = useMemo(() => {
+    let f = CI_FIELDS;
+    if (search) { const s = search.toLowerCase(); f = f.filter(c => c.toLowerCase().includes(s)); }
+    if (colFilter === 'mapped')   f = f.filter(c => fieldMappings[c]);
+    if (colFilter === 'unmapped') f = f.filter(c => !fieldMappings[c]);
+    return f;
+  }, [search, colFilter, fieldMappings]);
+
+  const visibleHeaders = useMemo(() => {
+    if (!search) return headers;
+    return headers; // always show all source cols
+  }, [headers]);
+
+  const [valFilter, setValFilter] = useState('');
+  const [valSort,   setValSort]   = useState('count'); // 'count' | 'alpha'
+
+  // Unique values for the selected column
+  const colStats = useMemo(() => {
+    if (!selectedCol || !rows.length) return null;
+    let filled = 0;
+    const counts = {};
+    rows.forEach(r => {
+      const v = (r[selectedCol] ?? '').toString().trim();
+      if (v !== '') { filled++; counts[v] = (counts[v] || 0) + 1; }
+      else { counts['(blank)'] = (counts['(blank)'] || 0) + 1; }
+    });
+    const entries = Object.entries(counts).map(([val, cnt]) => ({ val, cnt }));
+    return { filled, empty: rows.length - filled, distinct: Object.keys(counts).filter(k => k !== '(blank)').length + (counts['(blank)'] ? 0 : 0), distinctAll: Object.keys(counts).length, entries };
+  }, [selectedCol, rows]);
+
+  const uniqueValues = useMemo(() => {
+    if (!colStats) return [];
+    let list = colStats.entries;
+    if (valFilter) { const s = valFilter.toLowerCase(); list = list.filter(e => e.val.toLowerCase().includes(s)); }
+    if (valSort === 'alpha') list = [...list].sort((a, b) => a.val.localeCompare(b.val));
+    else list = [...list].sort((a, b) => b.cnt - a.cnt);
+    return list;
+  }, [colStats, valFilter, valSort]);
+
+  const maxValCount = uniqueValues.length ? Math.max(...uniqueValues.map(e => e.cnt)) : 1;
+
+  const exportCSV = () => {
+    const rows = ['Client Field,Map,CI Field Name'];
+    CI_FIELDS.forEach(ci => {
+      const client = fieldMappings[ci] || '';
+      const map    = client ? '→' : '';
+      rows.push(`"${client}","${map}","${ci}"`);
+    });
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'Field_Mapping_Export.csv'; a.click();
+  };
+
+  const clearAll = () => setFieldMappings(Object.fromEntries(CI_FIELDS.map(f => [f, ''])));
+
+  if (!headers.length) {
+    return (
+      <div style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',borderRadius:'var(--radius-lg)',padding:'2rem',textAlign:'center',boxShadow:'var(--shadow-xs)'}}>
+        <div style={{fontSize:'1.8rem',marginBottom:'0.5rem'}}>🗂️</div>
+        <div style={{fontWeight:700,color:'var(--text-muted)',marginBottom:'0.25rem'}}>No file loaded</div>
+        <div style={{fontSize:'0.78rem',color:'var(--text-light)'}}>Load a file on the <strong>Overview</strong> tab — your columns will appear here for mapping.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Top bar */}
+      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom:'0.85rem',flexWrap:'wrap'}}>
+        <div className="mapper-stats">
+          <span className="mapper-stat-pill total">{CI_FIELDS.length} CI Fields</span>
+          <span className="mapper-stat-pill done">{mappedCount} Mapped</span>
+          <span className="mapper-stat-pill pending">{CI_FIELDS.length - mappedCount} Unmapped</span>
+        </div>
+        <div style={{display:'flex',gap:'0.5rem',marginLeft:'auto',flexWrap:'wrap'}}>
+          <button className="sort-toggle-btn" onClick={exportCSV}>⬇ Export CSV</button>
+          <button className="file-clear-btn" onClick={clearAll}>✕ Clear all</button>
+        </div>
+      </div>
+
+      <div className="mapper-wrap">
+        {/* LEFT — source columns */}
+        <div className="mapper-source">
+          <div className="mapper-source-header">
+            <div className="panel-title">
+              Your Columns &nbsp;
+              <span style={{fontWeight:400,color:'var(--text-light)'}}>{headers.length} total · {mappedSet.size} mapped</span>
+            </div>
+            <input className="explorer-col-search" placeholder="Filter columns…"
+              onChange={e => {}} style={{width:'100%'}} />
+          </div>
+          <div style={{padding:'0.4rem 0.5rem',borderBottom:'1px solid var(--border-color)',display:'flex',gap:'4px',flexWrap:'wrap',background:'var(--bg-main)'}}>
+            <span style={{fontSize:'0.65rem',color:'var(--text-light)',alignSelf:'center',marginRight:2}}>🟢 mapped &nbsp; ⚪ unmapped</span>
+          </div>
+          <div className="mapper-col-list">
+            {headers.map(col => (
+              <div
+                key={col}
+                draggable
+                onDragStart={() => setDraggedCol(col)}
+                onDragEnd={() => setDraggedCol(null)}
+                onClick={() => setSelectedCol(col === selectedCol ? null : col)}
+                className={`mapper-col-chip ${mappedSet.has(col) ? 'mapped' : ''} ${draggedCol === col ? 'dragging' : ''} ${selectedCol === col ? 'selected' : ''}`}
+                title="Click to preview unique values · Drag onto a CI field to map"
+              >
+                <div className="chip-dot" />
+                <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{col}</span>
+                {mappedSet.has(col) && <span style={{fontSize:'0.6rem',opacity:0.7}}>✓</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT — mapping table */}
+        <div>
+          {/* Search + filter */}
+          <div style={{display:'flex',gap:'0.6rem',marginBottom:'0.6rem',flexWrap:'wrap',alignItems:'center'}}>
+            <input className="search-input" style={{flex:1,minWidth:180}} placeholder="Search CI fields…"
+              value={search} onChange={e => setSearch(e.target.value)} />
+            <select className="filter-select" value={colFilter} onChange={e => setColFilter(e.target.value)}>
+              <option value="all">All fields</option>
+              <option value="mapped">Mapped only</option>
+              <option value="unmapped">Unmapped only</option>
+            </select>
+            <span style={{fontSize:'0.72rem',color:'var(--text-muted)'}}>{filteredFields.length} of {CI_FIELDS.length}</span>
+          </div>
+
+          <div className="mapper-table-wrap">
+            <table className="mapper-table">
+              <thead>
+                <tr>
+                  <th style={{width:'38%'}}>Client Field</th>
+                  <th style={{width:36,textAlign:'center'}}></th>
+                  <th>CI Field Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredFields.map(ci => {
+                  const mapped  = fieldMappings[ci] || '';
+                  const isOver  = dropTarget === ci;
+                  const isMapped = Boolean(mapped);
+                  return (
+                    <tr key={ci}
+                      className={`mapper-row ${isMapped ? 'mapped-row' : ''} ${isOver ? 'drop-target' : ''}`}
+                      onDragOver={e => { e.preventDefault(); setDropTarget(ci); }}
+                      onDragLeave={() => setDropTarget(null)}
+                      onDrop={() => {
+                        if (draggedCol) setFieldMappings(p => ({ ...p, [ci]: draggedCol }));
+                        setDropTarget(null); setDraggedCol(null);
+                      }}
+                    >
+                      {/* Client field cell */}
+                      <td className="mapper-client-cell">
+                        <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
+                          <select
+                            className={`mapper-select ${isMapped ? 'has-value' : ''}`}
+                            value={mapped}
+                            onChange={e => setFieldMappings(p => ({ ...p, [ci]: e.target.value }))}
+                          >
+                            <option value="">— not mapped —</option>
+                            {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                          </select>
+                          {isMapped && (
+                            <button className="mapper-clear-btn"
+                              onClick={() => setFieldMappings(p => ({ ...p, [ci]: '' }))}
+                              title="Clear mapping">✕</button>
+                          )}
+                        </div>
+                      </td>
+                      {/* Arrow */}
+                      <td className="mapper-arrow">
+                        <span className={isMapped ? 'mapped' : ''}>
+                          {isMapped ? '✓' : isOver ? '⟵' : '→'}
+                        </span>
+                      </td>
+                      {/* CI field */}
+                      <td className="mapper-ci-field">{ci}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* RIGHT — unique values preview */}
+        <div className="mapper-vals-panel">
+          {!selectedCol ? (
+            <div className="mapper-vals-empty" style={{padding:'3rem 1.5rem'}}>
+              <div style={{fontSize:'1.4rem',marginBottom:'0.5rem'}}>←</div>
+              <div style={{fontWeight:700,marginBottom:'0.25rem',color:'var(--text-muted)'}}>Select a column</div>
+              <div style={{color:'var(--text-light)'}}>Click any column on the left to see its unique values here</div>
+            </div>
+          ) : (
+            <>
+              {/* Column name heading */}
+              <div style={{padding:'0.75rem 1rem 0.5rem',borderBottom:'1px solid var(--border-color)',background:'var(--bg-main)'}}>
+                <div style={{fontFamily:'var(--font-mono)',fontWeight:700,fontSize:'0.9rem',color:'var(--primary)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} title={selectedCol}>{selectedCol}</div>
+              </div>
+
+              {/* Stats bar */}
+              {colStats && (
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'0',borderBottom:'1px solid var(--border-color)',background:'var(--bg-card)'}}>
+                  {[
+                    {label:'TOTAL ROWS', val: rows.length.toLocaleString(), color:'var(--text-main)'},
+                    {label:'FILLED',     val: colStats.filled.toLocaleString(), color:'var(--success)'},
+                    {label:'EMPTY',      val: colStats.empty.toLocaleString(),  color: colStats.empty > 0 ? 'var(--danger)' : 'var(--text-muted)'},
+                    {label:'COMPLETE',   val: rows.length ? (colStats.filled/rows.length*100).toFixed(1)+'%' : '—', color:'var(--primary)'},
+                    {label:'DISTINCT',   val: colStats.distinctAll.toLocaleString(), color:'var(--accent)'},
+                    {label:'SHOWING',    val: uniqueValues.length+' vals', color:'var(--text-muted)'},
+                  ].map(s => (
+                    <div key={s.label} style={{padding:'0.45rem 0.6rem',borderRight:'1px solid var(--border-color)',borderBottom:'1px solid var(--border-color)'}}>
+                      <div style={{fontSize:'0.58rem',fontWeight:700,color:'var(--text-light)',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:'2px'}}>{s.label}</div>
+                      <div style={{fontSize:'0.78rem',fontWeight:700,color:s.color}}>{s.val}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Filter + sort */}
+              <div style={{padding:'0.5rem 0.6rem',borderBottom:'1px solid var(--border-color)',display:'flex',gap:'0.4rem',alignItems:'center',background:'var(--bg-main)'}}>
+                <input
+                  className="explorer-col-search"
+                  style={{flex:1,fontSize:'0.72rem',padding:'5px 8px'}}
+                  placeholder="Filter values…"
+                  value={valFilter}
+                  onChange={e => setValFilter(e.target.value)}
+                />
+                <button className={`sort-toggle-btn${valSort==='count'?' active':''}`} style={{fontSize:'0.65rem',padding:'4px 7px'}} onClick={() => setValSort('count')}>By Count</button>
+                <button className={`sort-toggle-btn${valSort==='alpha'?' active':''}`} style={{fontSize:'0.65rem',padding:'4px 7px'}} onClick={() => setValSort('alpha')}>A→Z</button>
+              </div>
+
+              {/* Values list */}
+              <div className="mapper-vals-list">
+                {uniqueValues.length === 0 && <div className="mapper-vals-empty">No matching values</div>}
+                {uniqueValues.map(({ val, cnt }) => (
+                  <div key={val} className="mapper-val-row">
+                    <span className="mapper-val-label" title={val}
+                      style={{color: val==='(blank)' ? 'var(--text-light)' : 'var(--text-main)', fontStyle: val==='(blank)' ? 'italic' : 'normal'}}
+                    >{val}</span>
+                    <div className="mapper-val-bar-wrap" style={{width:'50px'}}>
+                      <div className="mapper-val-bar" style={{width:`${Math.round((cnt/maxValCount)*100)}%`}} />
+                    </div>
+                    <span className="mapper-val-count">{cnt.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// FIELD REFERENCE TAB
+// ============================================================
+function FieldReference() {
+  const [search, setSearch] = useState('');
+  const [catFilter, setCat]  = useState('all');
+
+  const cats = useMemo(() => ['all', ...Array.from(new Set(FIELD_REFERENCE.map(f => f.cat)))], []);
+  const filtered = useMemo(() => {
+    let r = [...FIELD_REFERENCE];
+    if (catFilter !== 'all') r = r.filter(f => f.cat === catFilter);
+    if (search) { const s = search.toLowerCase(); r = r.filter(f => f.extract.toLowerCase().includes(s) || f.db.toLowerCase().includes(s) || f.edi.toLowerCase().includes(s)); }
+    return r;
+  }, [search, catFilter]);
+
+  // Group by category for rendering
+  const grouped = useMemo(() => {
+    const g = {};
+    filtered.forEach(f => { if (!g[f.cat]) g[f.cat] = []; g[f.cat].push(f); });
+    return g;
+  }, [filtered]);
+
+  return (
+    <div>
+      <div style={{marginBottom:'0.75rem',fontSize:'0.82rem',color:'var(--text-muted)'}}>
+        93 source extract columns mapped to CI database fields across 15 functional categories. Source: <em>Thrasher_Custom_Extract_v3.xlsx — 37,169 rows</em>.
+      </div>
+      <div className="filter-bar">
+        <input className="search-input" placeholder="Search fields, DB columns, EDI refs…" value={search} onChange={e => setSearch(e.target.value)} />
+        <select className="filter-select" value={catFilter} onChange={e => setCat(e.target.value)}>
+          {cats.map(c => <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>)}
+        </select>
+        <span style={{fontSize:'0.75rem',color:'var(--text-muted)',marginLeft:'auto'}}>{filtered.length} of {FIELD_REFERENCE.length} fields</span>
+      </div>
+      <div className="card" style={{padding:0,overflow:'hidden'}}>
+        <table className="field-table">
+          <thead>
+            <tr>
+              <th style={{width:200}}>Extract Column</th>
+              <th style={{width:170}}>CI DB Field</th>
+              <th style={{width:110}}>Target Table</th>
+              <th>EDI Source</th>
+              <th style={{width:190}}>Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(grouped).map(([cat, rows]) => [
+              <tr key={'cat-'+cat} className="cat-divider"><td colSpan={5}>{cat} ({rows.length})</td></tr>,
+              ...rows.map((f,i) => (
+                <tr key={cat+'-'+i}>
+                  <td>{f.extract}</td>
+                  <td><span className="mono">{f.db}</span></td>
+                  <td><span className="badge badge-info" style={{fontSize:'0.65rem'}}>{f.table}</span></td>
+                  <td style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--text-muted)'}}>{f.edi}</td>
+                  <td style={{fontSize:'0.72rem',color:'var(--text-muted)'}}>{f.cat}</td>
+                </tr>
+              ))
+            ])}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// VALIDATION RULES TAB
+// ============================================================
+function ValidationRules() {
+  return (
+    <div>
+      <div style={{marginBottom:'0.75rem',fontSize:'0.82rem',color:'var(--text-muted)'}}>
+        10 Pre & Post Mapping Validation rules (MV-1 through MV-10) from CI_Calculations_v3_2.md Section 10.
+        These rules are implemented in the Pre & Post Mapping Validation Portal v2.0.
+      </div>
+
+      <div className="stats-row" style={{marginBottom:'1.25rem'}}>
+        <div className="stat-card">
+          <div className="stat-label">Total Rules</div>
+          <div className="stat-value">{MV_RULES.length}</div>
+          <div className="stat-sub">MV-1 through MV-10</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Rules with Thresholds</div>
+          <div className="stat-value">{MV_RULES.filter(r => r.thresholds).length}</div>
+          <div className="stat-sub">Pass / Warn / Fail defined</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Per-Field Rules</div>
+          <div className="stat-value">2</div>
+          <div className="stat-sub">MV-4 Pre-Mapping · MV-5 Post-Mapping</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Aggregate Rules</div>
+          <div className="stat-value">8</div>
+          <div className="stat-sub">Dataset-level validation scores</div>
+        </div>
+      </div>
+
+      <div className="mv-grid">
+        {MV_RULES.map(r => (
+          <div className="mv-card" key={r.id}>
+            <div className="mv-card-header">
+              <div>
+                <div className="mv-id">{r.id}</div>
+              </div>
+            </div>
+            <div className="mv-name">{r.name}</div>
+            <div className="mv-def">{r.definition}</div>
+            {r.thresholds && (
+              <div className="mv-thresholds">
+                {r.thresholds.map((t,i) => (
+                  <span key={i} className={`threshold-chip ${t.cls}`}>{t.label}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="card" style={{marginTop:'1rem'}}>
+        <div className="card-title">Composite Status Logic — MV-4 Pre-Mapping Validation</div>
+        <table className="metrics-table">
+          <thead><tr>
+            <th>Check</th><th>Pass</th><th>Warning</th><th>Fail</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Completeness (required field)</td><td>≥95% filled</td><td>50–95% filled</td><td>&lt;50% or required &lt;95%</td></tr>
+            <tr><td>Completeness (optional field)</td><td>≥99% filled</td><td>50–99% filled</td><td>&lt;50% filled</td></tr>
+            <tr><td>Type Match</td><td>Exact match</td><td>Mixed / Unknown source type</td><td>Type mismatch</td></tr>
+            <tr><td>Cardinality</td><td>&gt;1 distinct value</td><td>—</td><td>1 distinct value (constant)</td></tr>
+            <tr><td>Mapping Defined</td><td>CI mapping exists</td><td>—</td><td>No CI mapping</td></tr>
+          </tbody>
+        </table>
+        <div style={{marginTop:'0.75rem',fontSize:'0.78rem',color:'var(--text-muted)',padding:'0.6rem 0.85rem',background:'var(--warning-bg)',borderRadius:'var(--radius-sm)',borderLeft:'3px solid var(--warning)'}}>
+          <strong>Composite Rule:</strong> If any check = FAIL → composite status is <strong>FAIL</strong>. If any check = WARN → <strong>WARN</strong>. Otherwise → <strong>PASS</strong>.
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">Standard Ignore Flag Filters</div>
+        <p style={{fontSize:'0.82rem',color:'var(--text-muted)',marginBottom:'0.75rem'}}>All metrics must exclude records flagged for CI-internal ignore. Apply to every query.</p>
+        <div className="expand-grid">
+          <div className="expand-section">
+            <h4>SQL Pattern</h4>
+            <div className="code-block">{`AND COALESCE(cl.cl_ci_ignore, 0) = 0\nAND COALESCE(ln.ln_ci_ignore, 0) = 0`}</div>
+          </div>
+          <div className="expand-section">
+            <h4>DAX Pattern</h4>
+            <div className="code-block">{`CALCULATE(\n    [Measure],\n    Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore]),\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])\n)`}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CSV PARSER (handles quoted fields)
+// ============================================================
+function detectDelimiter(firstLine) {
+  const candidates = [',', '\t', '|', ';'];
+  let best = ',', bestCount = 0;
+  candidates.forEach(d => {
+    const count = firstLine.split(d).length - 1;
+    if (count > bestCount) { bestCount = count; best = d; }
+  });
+  return best;
+}
+
+function parseCSVLine(line, delim) {
+  // Fast path — no quotes present (covers nearly all pipe/tab/semicolon files)
+  if (line.indexOf('"') === -1) {
+    return line.split(delim).map(v => v.trim());
+  }
+  // Slow path — handle quoted fields
+  const result = [];
+  let current = '', inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQuotes = !inQuotes; }
+    else if (c === delim && !inQuotes) { result.push(current.trim()); current = ''; }
+    else { current += c; }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+function parseCSV(text) {
+  const rawLines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const lines = rawLines.filter(l => l.trim().length > 0);
+  if (lines.length < 2) return { headers: [], rows: [], delim: ',' };
+  const delim = detectDelimiter(lines[0]);
+  const headers = parseCSVLine(lines[0], delim).map(h => h.replace(/^"|"$/g, '').trim());
+  const hLen = headers.length;
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = parseCSVLine(lines[i], delim);
+    const row = {};
+    for (let j = 0; j < hLen; j++) {
+      const v = vals[j];
+      row[headers[j]] = v ? v.replace(/^"|"$/g, '').trim() : '';
+    }
+    rows.push(row);
+  }
+  return { headers, rows, delim };
+}
+
+// Async chunked parser — yields to the browser every CHUNK rows so large files
+// don't freeze/kill the script. onProgress(rowsDone, rowsTotal), onDone(parsed|null).
+function parseCSVChunked(text, onProgress, onDone) {
+  try {
+    if (!text || typeof text !== 'string') { onDone(null); return; }
+    const CHUNK = 5000;
+    // Normalise line endings then split — more reliable than regex split
+    const raw = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = raw.split('\n');
+    // find first non-blank line
+    let start = 0;
+    while (start < lines.length && !lines[start].trim()) start++;
+    if (start >= lines.length) { onDone(null); return; }
+    const delim = detectDelimiter(lines[start]);
+    const headers = parseCSVLine(lines[start], delim).map(h => h.replace(/^"|"$/g, '').trim()).filter(Boolean);
+    if (!headers.length) { onDone(null); return; }
+    const hLen = headers.length;
+    const total = lines.length;
+    const rows = [];
+    let i = start + 1;
+    function step() {
+      try {
+        const end = Math.min(i + CHUNK, total);
+        for (; i < end; i++) {
+          const line = lines[i];
+          if (!line || !line.trim()) continue;
+          const vals = parseCSVLine(line, delim);
+          const row = {};
+          for (let j = 0; j < hLen; j++) {
+            const v = vals[j];
+            row[headers[j]] = v ? v.replace(/^"|"$/g, '').trim() : '';
+          }
+          rows.push(row);
+        }
+        onProgress(rows.length, Math.max(total - start - 1, 1));
+        if (i < total) { setTimeout(step, 0); }
+        else { onDone({ headers, rows, delim }); }
+      } catch(e) {
+        console.error('parseCSVChunked step error:', e);
+        onDone(rows.length ? { headers, rows, delim } : null);
+      }
+    }
+    setTimeout(step, 0);
+  } catch(e) {
+    console.error('parseCSVChunked init error:', e);
+    onDone(null);
+  }
+}
+
+
+// ============================================================
+// MAIN APP
+// ============================================================
+function App() {
+  const [tab, setTab] = useState('overview');
+
+  const EMPTY_FILE     = { headers: [], rows: [], fileName: '', delim: ',', fileNames: [] };
+  const EMPTY_MAPPINGS = Object.fromEntries(COMPUTABLE_METRICS.map(m => [m.id, '']));
+  const EMPTY_FIELD_MAPPINGS = Object.fromEntries(CI_FIELDS.map(f => [f, '']));
+
+  const [fileData,       setFileData]       = useState(EMPTY_FILE);
+  const [metricMappings, setMetricMappings] = useState(EMPTY_MAPPINGS);
+  const [fieldMappings,  setFieldMappings]  = useState(EMPTY_FIELD_MAPPINGS);
+
+  const handleLoad = useCallback((dataOrText, name, fileNames = []) => {
+    if (!dataOrText) {
+      setFileData(EMPTY_FILE);
+      setMetricMappings(EMPTY_MAPPINGS);
+      return;
+    }
+    // Accept either pre-parsed { headers, rows, delim } or raw text string
+    const { headers, rows, delim } = typeof dataOrText === 'string'
+      ? parseCSV(dataOrText)
+      : dataOrText;
+    if (!headers.length) return;
+    setFileData({ headers, rows, fileName: name, delim, fileNames });
+    setMetricMappings(EMPTY_MAPPINGS);
+  }, []);
+
+  const TABS = [
+    { key:'overview',    label:'Overview' },
+    { key:'metrics',     label:'Metrics Catalog' },
+    { key:'mapper',      label:'Field Mapper' },
+    { key:'fields',      label:'Field Reference' },
+    { key:'validation',  label:'Validation Rules' },
+  ];
+
+  return (
+    <div>
+      {/* HEADER */}
+      <div className="header">
+        <div className="header-left">
+          <div className="ci-logo">
+            <div className="logo-dot" />
+            <span className="claim">Claim</span><span className="informatics">Informatics</span><span className="tm">™</span>
+          </div>
+          <div className="nav-tabs">
+            {TABS.map(t => (
+              <button key={t.key} className={`nav-tab ${tab === t.key ? 'active' : ''}`} onClick={() => setTab(t.key)}>{t.label}</button>
+            ))}
+          </div>
+        </div>
+        <div className="header-right">
+          <div className="powered-by">
+            <span>Powered by</span>
+            <span className="powered-logo"><span className="claim">Claim</span><span className="informatics">Informatics</span></span>
+          </div>
+        </div>
+      </div>
+
+      {/* PAGE */}
+      <div className="page-container">
+        <div className="client-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+          <span className="client-name">CI Calculations — Validation Portal</span>
+          <span className="client-sub">Standard Calculations Reference v3.2 · {METRICS.length} metrics · {FIELD_REFERENCE.length} fields · {MV_RULES.length} validation rules</span>
+        </div>
+
+        {/* SECTION BAR (mobile/alternative nav) */}
+        <div className="section-bar">
+          <span className="label">Section:</span>
+          {TABS.map(t => (
+            <button key={t.key} className={`section-btn ${tab === t.key ? 'active' : ''}`} onClick={() => setTab(t.key)}>{t.label}</button>
+          ))}
+        </div>
+
+        {tab === 'overview'   && <Overview onNav={setTab} fileData={fileData} onLoad={handleLoad} />}
+        {tab === 'metrics'    && <MetricsCatalog fileData={fileData} metricMappings={metricMappings} setMetricMappings={setMetricMappings} />}
+        {tab === 'mapper'     && <FieldMapper fileData={fileData} fieldMappings={fieldMappings} setFieldMappings={setFieldMappings} />}
+        {tab === 'fields'     && <FieldReference />}
+        {tab === 'validation' && <ValidationRules />}
+
+        <div className="portal-footer">
+          CI Calculations Validation Portal v1.0 &nbsp;·&nbsp; Source: CI_Calculations_v3_2.md · Pre_Post_Mapping_Validation_Documentation_v2_0.docx &nbsp;·&nbsp; 2026-03-16 &nbsp;·&nbsp; ClaimInformatics™
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+    </script>
+</body>
+</html>
