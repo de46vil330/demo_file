@@ -657,21 +657,21 @@ const MV_RULES = [
 ];
 
 const FIELD_REFERENCE = [
-  { cat:'Claim Identification', extract:'Claim Number', db:'cl_claimid', table:'claim', edi:'837/835' },
-  { cat:'Claim Identification', extract:'Claim Line Number', db:'ln_linenum', table:'claimline', edi:'837 LX01' },
+  { cat:'Claim Identification', extract:'Claim Number', db:'cl_claim', table:'claim', edi:'837/835' },
+  { cat:'Claim Identification', extract:'Claim Line Number', db:'ln_line', table:'claimline', edi:'837 LX01' },
   { cat:'Claim Identification', extract:'Claim Status Code', db:'cl_claimstatus', table:'claim', edi:'835 CLP02' },
   { cat:'Claim Identification', extract:'Claim Type', db:'cl_claimtype', table:'claim', edi:'835 CLP06' },
   { cat:'Claim Identification', extract:'Patient Control / Account Number', db:'cl_ptacctno', table:'claim', edi:'837 CLM01' },
   { cat:'Service Details', extract:'Place of Service', db:'ln_pos', table:'claimline', edi:'837 SV105' },
-  { cat:'Service Details', extract:'From Date of Service (Professional)', db:'ln_dateserv', table:'claimline', edi:'837 DTP (472)' },
-  { cat:'Service Details', extract:'To Date of Service (Professional)', db:'ln_dateserv_to', table:'claimline', edi:'837 DTP (472)' },
-  { cat:'Service Details', extract:'Statement Covers Period: From (UB04)', db:'cl_dateadmit', table:'claim', edi:'837I DTP (096)' },
-  { cat:'Service Details', extract:'Statement Covers Period: Through (UB04)', db:'cl_datedisch', table:'claim', edi:'837I DTP (097)' },
-  { cat:'Service Details', extract:'Type of Service', db:'ln_tos', table:'claimline', edi:'837 SV101-1' },
-  { cat:'Service Details', extract:'Type of Bill', db:'cl_typeofbill', table:'claim', edi:'837I CLM05-1' },
-  { cat:'Procedure Codes', extract:'CPT / HCPCS Code (Professional)', db:'ln_proc', table:'claimline', edi:'837P SV101-2' },
+  { cat:'Service Details', extract:'From Date of Service (Professional)', db:'ln_fdos', table:'claimline', edi:'837 DTP (472)' },
+  { cat:'Service Details', extract:'To Date of Service (Professional)', db:'ln_tdos', table:'claimline', edi:'837 DTP (472)' },
+  { cat:'Service Details', extract:'Statement Covers Period: From (UB04)', db:'cl_statementfromdate', table:'claim', edi:'837I DTP (096)' },
+  { cat:'Service Details', extract:'Statement Covers Period: Through (UB04)', db:'cl_statementthroughdate', table:'claim', edi:'837I DTP (097)' },
+  { cat:'Service Details', extract:'Type of Service', db:'ln_typeofservice', table:'claimline', edi:'837 SV101-1' },
+  { cat:'Service Details', extract:'Type of Bill', db:'cl_tob', table:'claim', edi:'837I CLM05-1' },
+  { cat:'Procedure Codes', extract:'CPT / HCPCS Code (Professional)', db:'ln_cpt', table:'claimline', edi:'837P SV101-2' },
   { cat:'Procedure Codes', extract:'Revenue Code', db:'ln_revcode', table:'claimline', edi:'837I SV201' },
-  { cat:'Procedure Codes', extract:'CPT / HCPCS / HIPPS Code (Facility)', db:'ln_proc_fac', table:'claimline', edi:'837I SV202' },
+  { cat:'Procedure Codes', extract:'CPT / HCPCS / HIPPS Code (Facility)', db:'ln_hcpcs_code', table:'claimline', edi:'837I SV202' },
   { cat:'Procedure Codes', extract:'DRG Code', db:'cl_drg', table:'claim', edi:'837I HI (DRG)' },
   { cat:'Procedure Codes', extract:'NDC Number', db:'ln_ndc', table:'claimline', edi:'837 LIN' },
   { cat:'Modifiers & Units', extract:'Units', db:'ln_units', table:'claimline', edi:'837 SV104' },
@@ -679,78 +679,148 @@ const FIELD_REFERENCE = [
   { cat:'Modifiers & Units', extract:'Modifier 2', db:'ln_mod2', table:'claimline', edi:'837 SV101-4' },
   { cat:'Modifiers & Units', extract:'Modifier 3', db:'ln_mod3', table:'claimline', edi:'837 SV101-5' },
   { cat:'Modifiers & Units', extract:'Modifier 4', db:'ln_mod4', table:'claimline', edi:'837 SV101-6' },
-  { cat:'Modifiers & Units', extract:'Anesthesia Minutes', db:'ln_anesthmin', table:'claimline', edi:'837 SV104' },
-  { cat:'Modifiers & Units', extract:'Quantity', db:'ln_qty', table:'claimline', edi:'835 SVC' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 1', db:'cl_diag1', table:'claim', edi:'837 HI (ABK/ABF)' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 2', db:'cl_diag2', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 3', db:'cl_diag3', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 4', db:'cl_diag4', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 5', db:'cl_diag5', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 6', db:'cl_diag6', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 7', db:'cl_diag7', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 8', db:'cl_diag8', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 9', db:'cl_diag9', table:'claim', edi:'837 HI' },
-  { cat:'Diagnosis Codes', extract:'Diagnosis 10', db:'cl_diag10', table:'claim', edi:'837 HI' },
-  { cat:'Financial', extract:'Billed / Charged Amount', db:'ln_charged', table:'claimline', edi:'837 SV102 / 835 SVC02' },
+  { cat:'Modifiers & Units', extract:'Anesthesia Minutes', db:'ln_anes_time', table:'claimline', edi:'837 SV104' },
+  { cat:'Modifiers & Units', extract:'Quantity', db:'ln_units', table:'claimline', edi:'835 SVC' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 1', db:'ln_dx1', table:'claimline', edi:'837 HI (ABK/ABF)' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 2', db:'ln_dx2', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 3', db:'ln_dx3', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 4', db:'ln_dx4', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 5', db:'ln_dx5', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 6', db:'ln_dx6', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 7', db:'ln_dx7', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 8', db:'ln_dx8', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 9', db:'ln_dx9', table:'claimline', edi:'837 HI' },
+  { cat:'Diagnosis Codes', extract:'Diagnosis 10', db:'ln_dx10', table:'claimline', edi:'837 HI' },
+  { cat:'Financial', extract:'Billed / Charged Amount', db:'ln_billed', table:'claimline', edi:'837 SV102 / 835 SVC02' },
   { cat:'Financial', extract:'Allowed Amount', db:'ln_allowed', table:'claimline', edi:'835 SVC03' },
   { cat:'Financial', extract:'Paid Amount', db:'ln_paid', table:'claimline', edi:'835 SVC03' },
   { cat:'Financial', extract:'Deductible Amount', db:'ln_deductible', table:'claimline', edi:'835 CAS (1)' },
   { cat:'Financial', extract:'Copay Amount', db:'ln_copay', table:'claimline', edi:'835 CAS (2)' },
   { cat:'Financial', extract:'Coinsurance Amount', db:'ln_coinsurance', table:'claimline', edi:'835 CAS (3)' },
-  { cat:'Financial', extract:'Not Covered Amount', db:'ln_notcovered', table:'claimline', edi:'835 CAS' },
-  { cat:'Financial', extract:'Not Covered Reason Code', db:'ln_notcovered_reason', table:'claimline', edi:'835 CAS' },
-  { cat:'Financial', extract:'COB Savings', db:'ln_cobsavings', table:'claimline', edi:'835' },
+  { cat:'Financial', extract:'Not Covered Amount', db:'ln_nc1_amt', table:'claimline', edi:'835 CAS' },
+  { cat:'Financial', extract:'Not Covered Reason Code', db:'ln_nc1_code', table:'claimline', edi:'835 CAS' },
+  { cat:'Financial', extract:'COB Savings', db:'ln_cobadj', table:'claimline', edi:'835' },
   { cat:'Payment Details', extract:'Payee', db:'cl_payee', table:'claim', edi:'835 N1 (PE)' },
   { cat:'Payment Details', extract:'Claim Paid Date', db:'ln_datepaid', table:'claimline', edi:'835 DTM (405)' },
   { cat:'Payment Details', extract:'Check Number', db:'cl_checkno', table:'claim', edi:'835 TRN02' },
-  { cat:'Admission / Discharge', extract:'Admission Date', db:'cl_dateadmit', table:'claim', edi:'837I DTP (435)' },
-  { cat:'Admission / Discharge', extract:'Discharge Date', db:'cl_datedisch', table:'claim', edi:'837I DTP (096)' },
-  { cat:'Admission / Discharge', extract:'Admission Type', db:'cl_admtype', table:'claim', edi:'837I CL103' },
-  { cat:'Admission / Discharge', extract:'Admission Source', db:'cl_admsource', table:'claim', edi:'837I CL104' },
-  { cat:'Admission / Discharge', extract:'Patient Status', db:'cl_ptstatus', table:'claim', edi:'837I CL105' },
+  { cat:'Admission / Discharge', extract:'Admission Date', db:'cl_admitdate', table:'claim', edi:'837I DTP (435)' },
+  { cat:'Admission / Discharge', extract:'Discharge Date', db:'cl_dischargedate', table:'claim', edi:'837I DTP (096)' },
+  { cat:'Admission / Discharge', extract:'Admission Type', db:'cl_typeofadmission', table:'claim', edi:'837I CL103' },
+  { cat:'Admission / Discharge', extract:'Admission Source', db:'cl_sourceofadmission', table:'claim', edi:'837I CL104' },
+  { cat:'Admission / Discharge', extract:'Patient Status', db:'cl_ptdischargestatus', table:'claim', edi:'837I CL105' },
   { cat:'Admission / Discharge', extract:'DRG Code', db:'cl_drg', table:'claim', edi:'837I HI (DRG)' },
   { cat:'Admission / Discharge', extract:'Length of Stay', db:'cl_los', table:'claim', edi:'Derived' },
-  { cat:'Provider - Rendering', extract:'Service Provider Federal Tax ID', db:'prv_taxid', table:'claim', edi:'837 REF (EI)' },
-  { cat:'Provider - Rendering', extract:'Service/Rendering Provider NPI', db:'prv_npi', table:'claimline', edi:'837 NM109 (82)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider (Group) Name', db:'prv_grpname', table:'claim', edi:'837 NM103 (77)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider Name', db:'prv_name', table:'claim', edi:'837 NM103 (82)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider Address', db:'prv_addr1', table:'claim', edi:'837 N3 (82)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider Address 2', db:'prv_addr2', table:'claim', edi:'837 N3 (82)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider City', db:'prv_city', table:'claim', edi:'837 N4 (82)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider State', db:'prv_state', table:'claim', edi:'837 N4 (82)' },
-  { cat:'Provider - Rendering', extract:'Rendering Provider Zip', db:'prv_zip', table:'claim', edi:'837 N4 (82)' },
-  { cat:'Provider - Rendering', extract:'Taxonomy Code', db:'prv_taxonomy', table:'claim', edi:'837 PRV03' },
-  { cat:'Provider - Billing', extract:'Billing Provider Tax ID', db:'cl_billtaxid', table:'claim', edi:'837 REF (EI) (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider NPI', db:'cl_billnpi', table:'claim', edi:'837 NM109 (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider Name', db:'cl_billname', table:'claim', edi:'837 NM103 (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider Address', db:'cl_billaddr1', table:'claim', edi:'837 N3 (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider Address 2', db:'cl_billaddr2', table:'claim', edi:'837 N3 (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider City', db:'cl_billcity', table:'claim', edi:'837 N4 (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider State', db:'cl_billstate', table:'claim', edi:'837 N4 (85)' },
-  { cat:'Provider - Billing', extract:'Billing Provider Zip', db:'cl_billzip', table:'claim', edi:'837 N4 (85)' },
-  { cat:'Network', extract:'Network Name', db:'cl_networkname', table:'claim', edi:'Payer/TPA' },
-  { cat:'Network', extract:'Network Status', db:'cl_networkstatus', table:'claim', edi:'Payer/TPA' },
+  { cat:'Provider - Rendering', extract:'Service Provider Federal Tax ID', db:'cl_prvtaxid', table:'claim', edi:'837 REF (EI)' },
+  { cat:'Provider - Rendering', extract:'Service/Rendering Provider NPI', db:'ln_prvnpi', table:'claimline', edi:'837 NM109 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider (Group) Name', db:'cl_prvgroupname', table:'claim', edi:'837 NM103 (77)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Name', db:'cl_prvgroupname', table:'claim', edi:'837 NM103 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Address', db:'cl_prvaddress', table:'claim', edi:'837 N3 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Address 2', db:'cl_prvaddress2', table:'claim', edi:'837 N3 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider City', db:'cl_prvcity', table:'claim', edi:'837 N4 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider State', db:'cl_prvstate', table:'claim', edi:'837 N4 (82)' },
+  { cat:'Provider - Rendering', extract:'Rendering Provider Zip', db:'cl_prvzip', table:'claim', edi:'837 N4 (82)' },
+  { cat:'Provider - Rendering', extract:'Taxonomy Code', db:'cl_prvtaxonomy', table:'claim', edi:'837 PRV03' },
+  { cat:'Provider - Billing', extract:'Billing Provider Tax ID', db:'cl_prvbillingtaxid', table:'claim', edi:'837 REF (EI) (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider NPI', db:'cl_prvbillingnpi', table:'claim', edi:'837 NM109 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Name', db:'cl_prvbillinggroupname', table:'claim', edi:'837 NM103 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Address', db:'cl_prvbillingaddress', table:'claim', edi:'837 N3 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Address 2', db:'cl_prvbillingaddress2', table:'claim', edi:'837 N3 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider City', db:'cl_prvbillingcity', table:'claim', edi:'837 N4 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider State', db:'cl_prvbillingstate', table:'claim', edi:'837 N4 (85)' },
+  { cat:'Provider - Billing', extract:'Billing Provider Zip', db:'cl_prvbillingzip', table:'claim', edi:'837 N4 (85)' },
+  { cat:'Network', extract:'Network Name', db:'cl_network', table:'claim', edi:'Payer/TPA' },
+  { cat:'Network', extract:'Network Status', db:'cl_network_ind', table:'claim', edi:'Payer/TPA' },
   { cat:'Member / Patient', extract:'Employee/Subscriber ID/SSN', db:'cl_memid', table:'claim', edi:'837 NM109 (IL)' },
   { cat:'Member / Patient', extract:'Subscriber First Name', db:'cl_eefn', table:'claim', edi:'837 NM104 (IL)' },
   { cat:'Member / Patient', extract:'Subscriber Last Name', db:'cl_eeln', table:'claim', edi:'837 NM103 (IL)' },
   { cat:'Member / Patient', extract:'Patient First Name', db:'cl_ptfn', table:'claim', edi:'837 NM104 (QC)' },
   { cat:'Member / Patient', extract:'Patient Last Name', db:'cl_ptln', table:'claim', edi:'837 NM103 (QC)' },
   { cat:'Member / Patient', extract:'Patient DOB', db:'cl_ptdob', table:'claim', edi:'837 DMG02 (QC)' },
-  { cat:'Member / Patient', extract:'Patient Gender', db:'cl_ptgender', table:'claim', edi:'837 DMG03 (QC)' },
-  { cat:'Member / Patient', extract:'Patient/Dependent Number', db:'cl_depno', table:'claim', edi:'Payer/TPA' },
-  { cat:'Member / Patient', extract:'Patient Relationship Code', db:'cl_ptrelcode', table:'claim', edi:'837 SBR02' },
-  { cat:'Enrollment', extract:'Group Number', db:'cl_groupno', table:'claim', edi:'837 SBR03' },
-  { cat:'Enrollment', extract:'Coverage Effective Date', db:'cl_coveffdt', table:'claim', edi:'834 DTP (348)' },
-  { cat:'Enrollment', extract:'Coverage Termination Date', db:'cl_covtermdt', table:'claim', edi:'834 DTP (349)' },
-  { cat:'Address - Subscriber', extract:'Subscriber Address', db:'cl_eeaddr1', table:'claim', edi:'837 N3 (IL)' },
+  { cat:'Member / Patient', extract:'Patient Gender', db:'cl_ptsex', table:'claim', edi:'837 DMG03 (QC)' },
+  { cat:'Member / Patient', extract:'Patient/Dependent Number', db:'cl_ptdepno', table:'claim', edi:'Payer/TPA' },
+  { cat:'Member / Patient', extract:'Patient Relationship Code', db:'cl_ptrel', table:'claim', edi:'837 SBR02' },
+  { cat:'Enrollment', extract:'Group Number', db:'cl_eegroup', table:'claim', edi:'837 SBR03' },
+  { cat:'Enrollment', extract:'Coverage Effective Date', db:'cl_effective_date', table:'claim', edi:'834 DTP (348)' },
+  { cat:'Enrollment', extract:'Coverage Termination Date', db:'cl_terminated_date', table:'claim', edi:'834 DTP (349)' },
+  { cat:'Address - Subscriber', extract:'Subscriber Address', db:'cl_eeaddress', table:'claim', edi:'837 N3 (IL)' },
   { cat:'Address - Subscriber', extract:'Subscriber City', db:'cl_eecity', table:'claim', edi:'837 N4 (IL)' },
   { cat:'Address - Subscriber', extract:'Subscriber State', db:'cl_eestate', table:'claim', edi:'837 N4 (IL)' },
   { cat:'Address - Subscriber', extract:'Subscriber Zip Code', db:'cl_eezip', table:'claim', edi:'837 N4 (IL)' },
-  { cat:'Address - Patient', extract:'Patient Address', db:'cl_ptaddr1', table:'claim', edi:'837 N3 (QC)' },
+  { cat:'Address - Patient', extract:'Patient Address', db:'cl_ptaddress', table:'claim', edi:'837 N3 (QC)' },
   { cat:'Address - Patient', extract:'Patient City', db:'cl_ptcity', table:'claim', edi:'837 N4 (QC)' },
   { cat:'Address - Patient', extract:'Patient State', db:'cl_ptstate', table:'claim', edi:'837 N4 (QC)' },
   { cat:'Address - Patient', extract:'Patient Zip Code', db:'cl_ptzip', table:'claim', edi:'837 N4 (QC)' },
 ];
+
+const FORM_LOCATORS = {
+  'Place of Service':                        { cms1500:'Block 24B',       ub04:'' },
+  'From Date of Service (Professional)':     { cms1500:'Block 24A',       ub04:'' },
+  'To Date of Service (Professional)':       { cms1500:'Block 24A',       ub04:'' },
+  'Statement Covers Period: From (UB04)':    { cms1500:'',                ub04:'Block 6' },
+  'Statement Covers Period: Through (UB04)': { cms1500:'',                ub04:'Block 6' },
+  'Type of Service':                         { cms1500:'Block 24C',       ub04:'' },
+  'Type of Bill':                            { cms1500:'',                ub04:'Block 4' },
+  'CPT / HCPCS Code (Professional)':        { cms1500:'Block 24D',       ub04:'' },
+  'Revenue Code':                            { cms1500:'',                ub04:'Block 42' },
+  'CPT / HCPCS / HIPPS Code (Facility)':    { cms1500:'',                ub04:'Block 44' },
+  'DRG Code':                                { cms1500:'',                ub04:'Block 71' },
+  'NDC Number':                              { cms1500:'',                ub04:'Block 43' },
+  'Units':                                   { cms1500:'Block 24G',       ub04:'Block 46' },
+  'Modifier 1':                              { cms1500:'Block 24D',       ub04:'' },
+  'Modifier 2':                              { cms1500:'Block 24D',       ub04:'' },
+  'Modifier 3':                              { cms1500:'Block 24D',       ub04:'' },
+  'Modifier 4':                              { cms1500:'Block 24D',       ub04:'' },
+  'Anesthesia Minutes':                      { cms1500:'Block 24G',       ub04:'' },
+  'Diagnosis 1':                             { cms1500:'Block 21',        ub04:'Block 67' },
+  'Diagnosis 2':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 3':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 4':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 5':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 6':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 7':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 8':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 9':                             { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Diagnosis 10':                            { cms1500:'Block 21',        ub04:'Block 67 A-Q' },
+  'Billed / Charged Amount':                 { cms1500:'Block 24F',       ub04:'Block 47' },
+  'Patient Control / Account Number':        { cms1500:'Block 26',        ub04:'Block 3a' },
+  'Admission Date':                          { cms1500:'',                ub04:'Block 12' },
+  'Admission Type':                          { cms1500:'',                ub04:'Block 14' },
+  'Admission Source':                        { cms1500:'',                ub04:'Block 15' },
+  'Patient Status':                          { cms1500:'',                ub04:'Block 17' },
+  'Service Provider Federal Tax ID':         { cms1500:'Block 25',        ub04:'' },
+  'Service/Rendering Provider NPI':          { cms1500:'Block 24J / 33A', ub04:'Block 56' },
+  'Rendering Provider (Group) Name':         { cms1500:'Block 24J / 33A', ub04:'Block 56' },
+  'Rendering Provider Name':                 { cms1500:'Block 24J / 33A', ub04:'Block 56' },
+  'Rendering Provider Address':              { cms1500:'Block 32',        ub04:'Block 1' },
+  'Rendering Provider Address 2':            { cms1500:'Block 32',        ub04:'Block 1' },
+  'Rendering Provider City':                 { cms1500:'Block 32',        ub04:'Block 1' },
+  'Rendering Provider State':                { cms1500:'Block 32',        ub04:'Block 1' },
+  'Rendering Provider Zip':                  { cms1500:'Block 32',        ub04:'Block 1' },
+  'Taxonomy Code':                           { cms1500:'Block 24J',       ub04:'' },
+  'Billing Provider Tax ID':                 { cms1500:'Block 33B',       ub04:'Block 5' },
+  'Billing Provider NPI':                    { cms1500:'Block 33A',       ub04:'' },
+  'Billing Provider Name':                   { cms1500:'Block 33',        ub04:'' },
+  'Billing Provider Address':                { cms1500:'Block 33',        ub04:'' },
+  'Billing Provider Address 2':              { cms1500:'Block 33',        ub04:'' },
+  'Billing Provider City':                   { cms1500:'Block 33',        ub04:'' },
+  'Billing Provider State':                  { cms1500:'Block 33',        ub04:'' },
+  'Billing Provider Zip':                    { cms1500:'Block 33',        ub04:'' },
+  'Employee/Subscriber ID/SSN':              { cms1500:'Block 1a',        ub04:'Block 60A' },
+  'Subscriber First Name':                   { cms1500:'Block 4',         ub04:'' },
+  'Subscriber Last Name':                    { cms1500:'Block 4',         ub04:'' },
+  'Patient First Name':                      { cms1500:'Block 2',         ub04:'' },
+  'Patient Last Name':                       { cms1500:'Block 2',         ub04:'' },
+  'Patient DOB':                             { cms1500:'Block 3',         ub04:'' },
+  'Patient Gender':                          { cms1500:'Block 3',         ub04:'' },
+  'Subscriber Address':                      { cms1500:'Block 7',         ub04:'' },
+  'Subscriber City':                         { cms1500:'Block 7',         ub04:'' },
+  'Subscriber State':                        { cms1500:'Block 7',         ub04:'' },
+  'Subscriber Zip Code':                     { cms1500:'Block 7',         ub04:'' },
+  'Patient Address':                         { cms1500:'Block 5',         ub04:'' },
+  'Patient City':                            { cms1500:'Block 5',         ub04:'' },
+  'Patient State':                           { cms1500:'Block 5',         ub04:'' },
+  'Patient Zip Code':                        { cms1500:'Block 5',         ub04:'' },
+};
 
 const CATEGORY_COLORS = {
   'Core': 'badge-core',
@@ -1021,21 +1091,6 @@ function Overview({ onNav, fileData, onLoad }) {
     return { complete, partial, sparse, empty, weightedPct, numericCols };
   }, [profiles]);
 
-  const numericTotals = useMemo(() => {
-    if (!dataStats) return [];
-    return dataStats.numericCols.slice(0, 8).map(p => {
-      let total = 0, count = 0, min = Infinity, max = -Infinity;
-      fileData.rows.forEach(row => {
-        const n = parseFloat(String(row[p.column] ?? '').replace(/[$,\s]/g, ''));
-        if (!isNaN(n)) { total += n; count++; if (n < min) min = n; if (n > max) max = n; }
-      });
-      return { col: p.column, total, avg: count > 0 ? total / count : 0, min: count > 0 ? min : 0, max: count > 0 ? max : 0, count };
-    });
-  }, [dataStats, fileData.rows]);
-
-  const fmtN = n => n == null ? '—' : Math.abs(n) >= 1e6
-    ? '$' + (n / 1e6).toFixed(2) + 'M'
-    : '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const hasFile = fileData.headers.length > 0;
 
@@ -1076,205 +1131,125 @@ function Overview({ onNav, fileData, onLoad }) {
         </div>
       )}
 
-      {/* ── UPLOAD ZONE ── */}
-      {!loadStatus && !hasFile && (
+      {/* ── FILE INFO BAR (always shown) ── */}
+      {!loadStatus && (
         <div
-          className={`explorer-drop-zone fade-up ${dragOver ? 'drag-over' : ''}`}
-          style={{marginBottom:'1.25rem'}}
+          style={{marginBottom:'0.85rem'}}
           onDragOver={e => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
-          onClick={() => fileRef.current && fileRef.current.click()}
         >
-          <div className="drop-icon">📂</div>
-          <div className="drop-title">Load one or more data files to begin</div>
-          <div className="drop-sub">CSV · TSV · TXT — select or drop multiple files to combine · delimiter auto-detected · stays local, nothing uploaded</div>
-          <input ref={fileRef} type="file" accept=".csv,.tsv,.txt" multiple style={{display:'none'}} onChange={e => handleFiles(e.target.files)} />
-        </div>
-      )}
-
-      {/* ── FILE LOADED — computed stats ── */}
-      {!loadStatus && hasFile && (
-        <div className="fade-up">
-          {/* file info bar */}
-          <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom: fileData.fileNames && fileData.fileNames.length > 1 ? '0.4rem' : '0.85rem',flexWrap:'wrap'}}>
-            <span style={{fontSize:'0.88rem',fontWeight:700,color:'var(--text-main)'}}>{fileData.fileName}</span>
-            <span style={{fontSize:'0.78rem',color:'var(--text-muted)'}}>{fileData.rows.length.toLocaleString()} rows · {fileData.headers.length} columns · <span style={{color:'var(--primary)',fontWeight:600}}>{DELIM_LABELS[fileData.delim] || fileData.delim}-delimited</span></span>
-            <button className="file-clear-btn" style={{marginLeft:'auto'}} onClick={() => onLoad(null, '')}>✕ Clear</button>
-            <button className="sort-toggle-btn" onClick={() => fileRef.current && fileRef.current.click()}>📂 Replace / Add files</button>
+          <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom: hasFile && fileData.fileNames && fileData.fileNames.length > 1 ? '0.4rem' : '0',flexWrap:'wrap'}}>
+            {hasFile ? <>
+              <span style={{fontSize:'0.88rem',fontWeight:700,color:'var(--text-main)'}}>{fileData.fileName}</span>
+              <span style={{fontSize:'0.78rem',color:'var(--text-muted)'}}>{fileData.rows.length.toLocaleString()} rows · {fileData.headers.length} columns · <span style={{color:'var(--primary)',fontWeight:600}}>{DELIM_LABELS[fileData.delim] || fileData.delim}-delimited</span></span>
+              <button className="file-clear-btn" style={{marginLeft:'auto'}} onClick={() => onLoad(null, '')}>✕ Clear</button>
+              <button className="sort-toggle-btn" onClick={() => fileRef.current && fileRef.current.click()}>📂 Replace / Add files</button>
+            </> : <>
+              <button className="sort-toggle-btn" style={{marginLeft:'auto',fontSize:'1rem',padding:'0.6rem 1.4rem',fontWeight:700}} onClick={() => fileRef.current && fileRef.current.click()}>📂 Load Files</button>
+            </>}
             <input ref={fileRef} type="file" accept=".csv,.tsv,.txt" multiple style={{display:'none'}} onChange={e => handleFiles(e.target.files)} />
           </div>
-
-          {/* multi-file list */}
-          {fileData.fileNames && fileData.fileNames.length > 1 && (
-            <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap',marginBottom:'0.85rem',alignItems:'center'}}>
+          {hasFile && fileData.fileNames && fileData.fileNames.length > 1 && (
+            <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap',marginBottom:'0.5rem',alignItems:'center'}}>
               <span style={{fontSize:'0.68rem',fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'0.04em'}}>Files loaded:</span>
               {fileData.fileNames.map((n, i) => (
                 <span key={i} style={{fontSize:'0.7rem',padding:'2px 8px',borderRadius:'20px',background:'var(--primary-faint)',color:'var(--primary)',fontFamily:'var(--font-mono)',fontWeight:500}}>{n}</span>
               ))}
             </div>
           )}
+        </div>
+      )}
 
-          {/* computed stat cards */}
-          <div className="stats-row" style={{marginBottom:'1rem'}}>
-            <div className="stat-card hero">
-              <div className="stat-label">Overall Completeness</div>
-              <div className="stat-value">{(dataStats.weightedPct * 100).toFixed(1)}%</div>
-              <div className="stat-sub">Weighted across all {fileData.headers.length} columns</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-label">Total Rows</div>
-              <div className="stat-value">{fileData.rows.length.toLocaleString()}</div>
-              <div className="stat-sub">{fileData.headers.length} columns profiled</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-label" style={{color:'var(--success)'}}>Complete Cols</div>
-              <div className="stat-value" style={{color:'var(--success)'}}>{dataStats.complete}</div>
-              <div className="stat-sub">≥99% filled</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-label" style={{color:'var(--warning)'}}>Partial Cols</div>
-              <div className="stat-value" style={{color:'var(--warning)'}}>{dataStats.partial}</div>
-              <div className="stat-sub">50–99% filled</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-label" style={{color:'var(--danger)'}}>Sparse / Empty</div>
-              <div className="stat-value" style={{color:'var(--danger)'}}>{dataStats.sparse + dataStats.empty}</div>
-              <div className="stat-sub">{dataStats.empty} fully empty · {dataStats.sparse} sparse</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-label">Numeric Cols</div>
-              <div className="stat-value" style={{color:'var(--info)'}}>{dataStats.numericCols.length}</div>
-              <div className="stat-sub">Auto-detected from values</div>
-            </div>
+      {/* ── STAT CARDS (always shown) ── */}
+      {!loadStatus && (
+        <div className="stats-row fade-up" style={{marginBottom:'1rem'}}>
+          <div className="stat-card hero">
+            <div className="stat-label">Overall Completeness</div>
+            <div className="stat-value">{hasFile ? `${(dataStats.weightedPct*100).toFixed(1)}%` : '—'}</div>
+            <div className="stat-sub">{hasFile ? `Weighted across all ${fileData.headers.length} columns` : 'Load a file to compute'}</div>
           </div>
-
-          {/* charts */}
-          <div className="chart-row" style={{marginBottom:'1rem'}}>
-            <div className="chart-box">
-              <h3>Top 20 Emptiest Columns</h3>
-              <div className="chart-wrap"><DataCompletenessChart profiles={profiles} /></div>
-            </div>
-            <div className="chart-box">
-              <h3>Data Type Distribution</h3>
-              <div className="chart-wrap"><DataTypeDonut profiles={profiles} /></div>
-            </div>
+          <div className="stat-card">
+            <div className="stat-label">Total Rows</div>
+            <div className="stat-value">{hasFile ? fileData.rows.length.toLocaleString() : '—'}</div>
+            <div className="stat-sub">{hasFile ? `${fileData.headers.length} columns profiled` : 'Load a file to compute'}</div>
           </div>
-
-          {/* numeric totals */}
-          {numericTotals.length > 0 && (
-            <div className="card" style={{marginBottom:'1rem'}}>
-              <div className="card-title">Numeric Column Totals <span className="card-subtitle">Auto-detected numeric columns</span></div>
-              <table className="metrics-table">
-                <thead><tr><th>Column</th><th>Total</th><th>Average</th><th>Min</th><th>Max</th><th>Numeric Rows</th></tr></thead>
-                <tbody>
-                  {numericTotals.map(t => (
-                    <tr key={t.col}>
-                      <td><span className="mono">{t.col}</span></td>
-                      <td style={{fontWeight:700,color:'var(--primary)'}}>{fmtN(t.total)}</td>
-                      <td>{fmtN(t.avg)}</td>
-                      <td>{fmtN(t.min)}</td>
-                      <td>{fmtN(t.max)}</td>
-                      <td>{t.count.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* all columns completeness */}
-          <div className="card">
-            <div className="card-title">Column Completeness <span className="card-subtitle">{profiles.length} columns · use Field Mapper to explore column values</span></div>
-            <table className="metrics-table">
-              <thead><tr><th>Column</th><th>Type</th><th>Filled</th><th>Empty</th><th>Distinct</th><th>Completeness</th></tr></thead>
-              <tbody>
-                {[...profiles].sort((a,b) => a.pctFilled - b.pctFilled).map(p => (
-                  <tr key={p.column}>
-                    <td><span className="mono">{p.column}</span></td>
-                    <td><span className={`badge ${p.dataType==='Numeric'?'badge-prepay':p.dataType==='Date'?'badge-datetime':p.dataType==='Empty'?'badge-fail':'badge-core'}`}>{p.dataType}</span></td>
-                    <td style={{color:'var(--success)'}}>{p.filledCount.toLocaleString()}</td>
-                    <td style={{color: p.nullCount > 0 ? 'var(--danger)' : 'var(--success)'}}>{p.nullCount.toLocaleString()}</td>
-                    <td style={{color:'var(--info)'}}>{p.distinctCount.toLocaleString()}</td>
-                    <td>
-                      <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-                        <div style={{width:80,height:6,borderRadius:3,background:'var(--border-color)',overflow:'hidden',flexShrink:0}}>
-                          <div style={{width:`${p.pctFilled*100}%`,height:'100%',borderRadius:3,background: p.pctFilled>=0.9?'var(--success)':p.pctFilled>=0.5?'var(--warning)':'var(--danger)'}} />
-                        </div>
-                        <span style={{fontSize:'0.75rem',fontWeight:700,color: p.pctFilled>=0.9?'var(--success)':p.pctFilled>=0.5?'var(--warning)':'var(--danger)'}}>{(p.pctFilled*100).toFixed(1)}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="stat-card">
+            <div className="stat-label" style={{color:'var(--success)'}}>Complete Cols</div>
+            <div className="stat-value" style={{color:'var(--success)'}}>{hasFile ? dataStats.complete : '—'}</div>
+            <div className="stat-sub">≥99% filled</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label" style={{color:'var(--warning)'}}>Partial Cols</div>
+            <div className="stat-value" style={{color:'var(--warning)'}}>{hasFile ? dataStats.partial : '—'}</div>
+            <div className="stat-sub">50–99% filled</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label" style={{color:'var(--danger)'}}>Sparse / Empty</div>
+            <div className="stat-value" style={{color:'var(--danger)'}}>{hasFile ? dataStats.sparse + dataStats.empty : '—'}</div>
+            <div className="stat-sub">{hasFile ? `${dataStats.empty} fully empty · ${dataStats.sparse} sparse` : 'Load a file to compute'}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Numeric Cols</div>
+            <div className="stat-value" style={{color:'var(--info)'}}>{hasFile ? dataStats.numericCols.length : '—'}</div>
+            <div className="stat-sub">Auto-detected from values</div>
           </div>
         </div>
       )}
 
-      {/* ── STATIC REFERENCE CONTENT (always shown) ── */}
-      <div className="stats-row fade-up fade-up-d1" style={{marginTop: hasFile ? '1.5rem' : 0}}>
-        <div className="stat-card hero">
-          <div className="stat-label">Total Metrics</div>
-          <div className="stat-value">{METRICS.length}</div>
-          <div className="stat-sub">Documented in CI_Calculations v3.2</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Categories</div>
-          <div className="stat-value">6</div>
-          <div className="stat-sub">Core · Pre-Pay · Post-Pay · Financial · Date · Profiler</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Source Fields Mapped</div>
-          <div className="stat-value">{FIELD_REFERENCE.length}</div>
-          <div className="stat-sub">Across 15 functional categories</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Validation Rules</div>
-          <div className="stat-value">{MV_RULES.length}</div>
-          <div className="stat-sub">Pre & Post Mapping (MV-1 – MV-10)</div>
-        </div>
-      </div>
-
-      <div className="cat-summary-grid fade-up fade-up-d2">
-        {CATEGORY_META.map(c => (
-          <div className="cat-summary-card" key={c.cat}>
-            <div className="cat-icon" style={{background:'var(--primary-faint)'}}>{c.icon}</div>
-            <div className="cat-text">
-              <div className="cat-title">{c.cat}</div>
-              <div className="cat-count">{c.count} metrics</div>
-              <div className="bar-mini"><div className="bar-mini-fill" style={{width:`${Math.min(c.count/10*100,100)}%`}} /></div>
-            </div>
+      {/* ── CHARTS (always shown) ── */}
+      {!loadStatus && (
+        <div className="chart-row" style={{marginBottom:'1rem'}}>
+          <div className="chart-box">
+            <h3>Top 20 Emptiest Columns</h3>
+            {hasFile
+              ? <div className="chart-wrap"><DataCompletenessChart profiles={profiles} /></div>
+              : <div style={{height:280,display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-light)',fontSize:'0.82rem'}}>Load a file to see chart</div>
+            }
           </div>
-        ))}
-      </div>
+          <div className="chart-box">
+            <h3>Data Type Distribution</h3>
+            {hasFile
+              ? <div className="chart-wrap"><DataTypeDonut profiles={profiles} /></div>
+              : <div style={{height:280,display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-light)',fontSize:'0.82rem'}}>Load a file to see chart</div>
+            }
+          </div>
+        </div>
+      )}
 
-      <div className="chart-row fade-up fade-up-d3">
-        <div className="chart-box">
-          <h3>Metrics by Category</h3>
-          <div className="chart-wrap"><CategoryChart metrics={METRICS} /></div>
+      {/* ── COLUMN COMPLETENESS TABLE (always shown) ── */}
+      {!loadStatus && (
+        <div className="card">
+          <div className="card-title">Column Completeness <span className="card-subtitle">{hasFile ? `${profiles.length} columns · use Field Mapper to explore column values` : 'Load a file to populate'}</span></div>
+          <table className="metrics-table">
+            <thead><tr><th>Column</th><th>Type</th><th>Filled</th><th>Empty</th><th>Distinct</th><th>Completeness</th></tr></thead>
+            <tbody>
+              {hasFile
+                ? [...profiles].sort((a,b) => a.pctFilled - b.pctFilled || a.column.localeCompare(b.column)).map(p => (
+                    <tr key={p.column}>
+                      <td><span className="mono">{p.column}</span></td>
+                      <td><span className={`badge ${p.dataType==='Numeric'?'badge-prepay':p.dataType==='Date'?'badge-datetime':p.dataType==='Empty'?'badge-fail':'badge-core'}`}>{p.dataType}</span></td>
+                      <td style={{color:'var(--success)'}}>{p.filledCount.toLocaleString()}</td>
+                      <td style={{color: p.nullCount > 0 ? 'var(--danger)' : 'var(--success)'}}>{p.nullCount.toLocaleString()}</td>
+                      <td style={{color:'var(--info)'}}>{p.distinctCount.toLocaleString()}</td>
+                      <td>
+                        <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
+                          <div style={{width:80,height:6,borderRadius:3,background:'var(--border-color)',overflow:'hidden',flexShrink:0}}>
+                            <div style={{width:`${p.pctFilled*100}%`,height:'100%',borderRadius:3,background: p.pctFilled>=0.9?'var(--success)':p.pctFilled>=0.5?'var(--warning)':'var(--danger)'}} />
+                          </div>
+                          <span style={{fontSize:'0.75rem',fontWeight:700,color: p.pctFilled>=0.9?'var(--success)':p.pctFilled>=0.5?'var(--warning)':'var(--danger)'}}>{(p.pctFilled*100).toFixed(1)}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                : <tr><td colSpan={6} style={{textAlign:'center',padding:'2rem',color:'var(--text-light)',fontSize:'0.82rem'}}>No data loaded — use the Load files button above to get started</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <div className="chart-box">
-          <h3>Source Fields by Category (93 fields)</h3>
-          <div className="chart-wrap"><FieldCategoryChart /></div>
-        </div>
-      </div>
+      )}
 
-      <div className="card fade-up fade-up-d4">
-        <div className="card-title">Source Reference Documents</div>
-        <table className="metrics-table">
-          <thead><tr><th>Document</th><th>Version</th><th>Purpose</th><th>Last Updated</th></tr></thead>
-          <tbody>
-            <tr><td>CI_Calculations_v3_2.md</td><td><span className="badge badge-pass">v3.2</span></td><td>Unified SQL, DAX & Power BI metric definitions</td><td>March 2026</td></tr>
-            <tr><td>Pre_Post_Mapping_Validation_Documentation_v2_0.docx</td><td><span className="badge badge-pass">v2.0</span></td><td>Pre & Post Mapping validation methodology</td><td>March 2026</td></tr>
-            <tr><td>Pre_Post_Mapping_Validation_Portal_v2_0.html</td><td><span className="badge badge-pass">v2.0</span></td><td>Interactive field profiler portal (37,169 rows × 93 cols)</td><td>2026-03-16</td></tr>
-          </tbody>
-        </table>
-        <div style={{marginTop:'1rem',padding:'0.75rem 1rem',background:'var(--primary-faint)',borderRadius:'var(--radius-sm)',fontSize:'0.78rem',color:'var(--text-muted)'}}>
-          <strong style={{color:'var(--primary)'}}>Standard Filter:</strong>&nbsp;
-          <code style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem'}}>COALESCE(cl_ci_ignore, 0) = 0 AND COALESCE(ln_ci_ignore, 0) = 0</code>
-        </div>
-      </div>
+
     </div>
   );
 }
@@ -1300,7 +1275,7 @@ function autoDetect(headers, id) {
     case 'CM-3': return find([/claim.*(?:id|no|num|nbr)|clm_id|claimid|claim_number/]);
     case 'CM-5': return find([/paid.*amt|amt.*paid|amount.*paid|paid_amount|paid_amnt/]);
     case 'CM-6':
-    case 'CM-7': return find([/paid.*dt|dt.*paid|paid.*date|payment.*date|pay.*date/]);
+    case 'CM-7': return '';
     default: return '';
   }
 }
@@ -1314,7 +1289,7 @@ function LiveMetrics({ fileData, mappings, setMappings }) {
     setMappings(prev => {
       const next = { ...prev };
       COMPUTABLE_METRICS.forEach(m => {
-        if (m.type !== 'rowcount' && !next[m.id])
+        if (m.type !== 'rowcount' && m.id !== 'CM-6' && m.id !== 'CM-7' && !next[m.id])
           next[m.id] = autoDetect(headers, m.id);
       });
       return next;
@@ -1415,6 +1390,7 @@ function LiveMetrics({ fileData, mappings, setMappings }) {
                 <span style={{fontSize:'1rem'}}>{m.icon}</span>
               </div>
               <div style={{fontSize:'0.8rem',fontWeight:700,color:'var(--text-main)'}}>{m.name}</div>
+              {m.type === 'distinct' && <div style={{fontSize:'0.64rem',color:'var(--text-light)',fontStyle:'italic'}}>Unique count in column</div>}
               {m.type === 'min_date' && <div style={{fontSize:'0.64rem',color:'var(--text-light)',fontStyle:'italic'}}>Earliest date in column</div>}
               {m.type === 'max_date' && <div style={{fontSize:'0.64rem',color:'var(--text-light)',fontStyle:'italic'}}>Latest date in column</div>}
               {m.type === 'rowcount' ? (
@@ -1423,7 +1399,7 @@ function LiveMetrics({ fileData, mappings, setMappings }) {
                 <select className="filter-select" style={{fontSize:'0.72rem',padding:'3px 6px',width:'100%'}}
                   value={col} onChange={e => setMappings(p => ({ ...p, [m.id]: e.target.value }))}>
                   <option value="">— select column —</option>
-                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                  {[...headers].sort((a,b) => a.localeCompare(b)).map(h => <option key={h} value={h}>{h}</option>)}
                 </select>
               )}
               <div style={{fontSize: has ? '1.45rem' : '1.1rem', fontWeight:800,
@@ -1442,10 +1418,146 @@ function LiveMetrics({ fileData, mappings, setMappings }) {
 }
 
 // ============================================================
+// TARGET COMPLETION PERCENTAGE
+// ============================================================
+const TARGET_COMPLETION_METRICS = [
+  {
+    id:'TC-1', name:'Place of Service', icon:'📍',
+    formula:'Count(Claim #) − Count(Type of Bill)',
+    formulaType:'subtract',
+    cols:[
+      { key:'field', label:'Place of Service col', hint:'e.g. POS, PLACE_OF_SERVICE' },
+      { key:'refA',  label:'Claim Number col',     hint:'e.g. CLAIM_NBR, CLM_ID' },
+      { key:'refB',  label:'Type of Bill col',     hint:'e.g. TOB, TYPE_OF_BILL' },
+    ],
+  },
+  {
+    id:'TC-2', name:'CPT / HCPCS (Professional)', icon:'🔬',
+    formula:'Count(Claim #) − Count(Type of Bill)',
+    formulaType:'subtract',
+    cols:[
+      { key:'field', label:'CPT / HCPCS col',   hint:'e.g. CPT_CODE, HCPCS' },
+      { key:'refA',  label:'Claim Number col',   hint:'e.g. CLAIM_NBR, CLM_ID' },
+      { key:'refB',  label:'Type of Bill col',   hint:'e.g. TOB, TYPE_OF_BILL' },
+    ],
+  },
+  {
+    id:'TC-3', name:'Revenue Code', icon:'🏷️',
+    formula:'Count(Type of Bill)',
+    formulaType:'single',
+    cols:[
+      { key:'field', label:'Revenue Code col',  hint:'e.g. REV_CODE, REVENUE_CODE' },
+      { key:'refA',  label:'Type of Bill col',  hint:'e.g. TOB, TYPE_OF_BILL' },
+    ],
+  },
+  {
+    id:'TC-5', name:'Type of Bill', icon:'📑',
+    formula:'Count(Revenue Code)',
+    formulaType:'single',
+    cols:[
+      { key:'field', label:'Type of Bill col',  hint:'e.g. TOB, TYPE_OF_BILL' },
+      { key:'refA',  label:'Revenue Code col',  hint:'e.g. REV_CODE, REVENUE_CODE' },
+    ],
+  },
+];
+
+function countFilled(rows, col) {
+  if (!col) return 0;
+  return rows.filter(r => String(r[col] ?? '').trim() !== '').length;
+}
+
+function TargetCompletion({ fileData, mappings, setMappings }) {
+  const { headers, rows, fileName } = fileData;
+
+  const results = useMemo(() => {
+    if (!rows.length) return {};
+    return Object.fromEntries(TARGET_COMPLETION_METRICS.map(m => {
+      const sel = mappings[m.id] || {};
+      const fieldCol = sel.field || '';
+      const refACol  = sel.refA  || '';
+      const refBCol  = sel.refB  || '';
+      if (!fieldCol || !refACol) return [m.id, null];
+      const actual = countFilled(rows, fieldCol);
+      const refA   = countFilled(rows, refACol);
+      const refB   = m.formulaType === 'subtract' ? countFilled(rows, refBCol) : 0;
+      const target = m.formulaType === 'subtract' ? refA - refB : refA;
+      if (target <= 0) return [m.id, null];
+      return [m.id, { actual, target }];
+    }));
+  }, [rows, mappings]);
+
+  if (!headers.length) return null;
+
+  const setSel = (id, key, val) =>
+    setMappings(prev => ({ ...prev, [id]: { ...(prev[id] || {}), [key]: val } }));
+
+  return (
+    <div style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',borderRadius:'var(--radius-lg)',padding:'1.1rem 1.25rem',boxShadow:'var(--shadow-sm)'}}>
+      <div style={{marginBottom:'1rem'}}>
+        <span style={{fontSize:'0.95rem',fontWeight:700}}>Target Completion Percentage</span>
+        <span style={{fontSize:'0.72rem',color:'var(--text-muted)',marginLeft:'0.75rem'}}>Select the matching columns — results show the actual filled count vs. the formula target count</span>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(260px,1fr))',gap:'0.75rem'}}>
+        {TARGET_COMPLETION_METRICS.map(m => {
+          const res = results[m.id];
+          const sel = mappings[m.id] || {};
+          const sortedHeaders = [...headers].sort((a,b) => a.localeCompare(b));
+          return (
+            <div key={m.id} style={{
+              background: res ? 'var(--primary-faint)' : 'var(--bg-main)',
+              border:`1px solid ${res ? 'rgba(119,37,108,0.2)' : 'var(--border-color)'}`,
+              borderRadius:'var(--radius-md)', padding:'0.85rem 1rem',
+              display:'flex', flexDirection:'column', gap:'0.4rem', transition:'border-color 0.2s'
+            }}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                <span className="mono" style={{fontSize:'0.65rem',fontWeight:700,color:'var(--primary)',background:'var(--primary-faint)',padding:'2px 6px',borderRadius:'4px'}}>{m.id}</span>
+                <span style={{fontSize:'1rem'}}>{m.icon}</span>
+              </div>
+              <div style={{fontSize:'0.8rem',fontWeight:700,color:'var(--text-main)'}}>{m.name}</div>
+              <div style={{fontSize:'0.65rem',color:'var(--text-light)',fontStyle:'italic',marginBottom:'0.1rem'}}>Target: {m.formula}</div>
+              {m.cols.map(c => (
+                <div key={c.key}>
+                  <div style={{fontSize:'0.63rem',color:'var(--text-muted)',marginBottom:'2px'}}>{c.label}</div>
+                  <select className="filter-select" style={{fontSize:'0.72rem',padding:'3px 6px',width:'100%'}}
+                    value={sel[c.key] || ''}
+                    onChange={e => setSel(m.id, c.key, e.target.value)}>
+                    <option value="">— select column —</option>
+                    {sortedHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                  </select>
+                </div>
+              ))}
+              {res ? (
+                <div style={{marginTop:'0.4rem',display:'flex',flexDirection:'column',gap:'0.2rem'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+                    <span style={{fontSize:'0.63rem',color:'var(--text-muted)'}}>Actual count</span>
+                    <span style={{fontSize:'1.3rem',fontWeight:800,color:'var(--primary)',letterSpacing:'-0.02em'}}>{res.actual.toLocaleString()}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+                    <span style={{fontSize:'0.63rem',color:'var(--text-muted)'}}>Target count</span>
+                    <span style={{fontSize:'1.3rem',fontWeight:800,color:'var(--text-main)',letterSpacing:'-0.02em'}}>{res.target.toLocaleString()}</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{fontSize:'1.1rem',fontWeight:800,color:'var(--text-light)',marginTop:'0.3rem'}}>—</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // METRICS CATALOG TAB
 // ============================================================
-function MetricsCatalog({ fileData, metricMappings, setMetricMappings }) {
-  return <LiveMetrics fileData={fileData} mappings={metricMappings} setMappings={setMetricMappings} />;
+function MetricsCatalog({ fileData, metricMappings, setMetricMappings, tcMappings, setTcMappings }) {
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+      <LiveMetrics fileData={fileData} mappings={metricMappings} setMappings={setMetricMappings} />
+      <TargetCompletion fileData={fileData} mappings={tcMappings} setMappings={setTcMappings} />
+    </div>
+  );
 }
 
 // ============================================================
@@ -1513,6 +1625,177 @@ const CI_FIELDS = [
 ];
 
 // ============================================================
+// FIELD MAPPING DATA — from Mapping Fields for Claude.txt
+// friendly must match CI_FIELDS keys exactly for fieldMappings lookup
+// ============================================================
+const FIELD_MAPPING_DATA = [
+  { claim:'cl_accidentstate',           claimline:'',                  friendly:'Accident State',                                              required:false },
+  { claim:'cl_additional_codes',        claimline:'',                  friendly:'Additional Codes',                                            required:false },
+  { claim:'cl_admitdate',               claimline:'ln_admitdate',      friendly:'Admission Date',                                              required:true  },
+  { claim:'cl_admithour',               claimline:'',                  friendly:'Admission Hour',                                              required:false },
+  { claim:'cl_admit_dx',                claimline:'',                  friendly:'Admitting Diagnosis',                                         required:false },
+  { claim:'',                           claimline:'ln_allowed',        friendly:'Allowed Amount',                                              required:true  },
+  { claim:'',                           claimline:'ln_anes_time',      friendly:'Anesthesia Minutes',                                          required:false },
+  { claim:'cl_manualprocess',           claimline:'',                  friendly:'Auto Adjudicated / Manual Flag',                              required:false },
+  { claim:'',                           claimline:'ln_billed',         friendly:'Billed / Charged Amount',                                     required:true  },
+  { claim:'cl_prvbillinggroupname',     claimline:'',                  friendly:'Billing Provider (Group) Name',                               required:true  },
+  { claim:'cl_prvbillingaddress',       claimline:'',                  friendly:'Billing Provider Address',                                    required:true  },
+  { claim:'cl_prvbillingaddress2',      claimline:'',                  friendly:'Billing Provider Address 2',                                  required:true  },
+  { claim:'cl_prvbillingcity',          claimline:'',                  friendly:'Billing Provider City',                                       required:true  },
+  { claim:'cl_prvbillingfax',           claimline:'',                  friendly:'Billing Provider Fax',                                        required:false },
+  { claim:'cl_prvbillingtaxid',         claimline:'',                  friendly:'Billing Provider Federal Tax ID Number',                      required:true  },
+  { claim:'cl_prvbillingtaxid_suf',     claimline:'',                  friendly:'Billing Provider Federal Tax ID suffix',                      required:false },
+  { claim:'cl_prvbillingfn',            claimline:'',                  friendly:'Billing Provider First Name',                                 required:false },
+  { claim:'cl_prvbillingln',            claimline:'',                  friendly:'Billing Provider Last Name',                                  required:false },
+  { claim:'cl_prvbillingnpi',           claimline:'',                  friendly:'Billing Provider National Provider Identifier',               required:false },
+  { claim:'cl_prvbillingphone',         claimline:'',                  friendly:'Billing Provider Phone',                                      required:false },
+  { claim:'cl_prvbillingstate',         claimline:'',                  friendly:'Billing Provider State',                                      required:true  },
+  { claim:'cl_prvbillingzip',           claimline:'',                  friendly:'Billing Provider Zip',                                        required:true  },
+  { claim:'cl_checkno',                 claimline:'',                  friendly:'Check Number / EFT Number',                                   required:true  },
+  { claim:'',                           claimline:'ln_line',           friendly:'Claim Line Number',                                           required:true  },
+  { claim:'cl_claim',                   claimline:'ln_claim',          friendly:'Claim Number',                                                required:true  },
+  { claim:'cl_datepaid',                claimline:'ln_datepaid',       friendly:'Claim Paid Date',                                             required:true  },
+  { claim:'cl_dateproc',                claimline:'ln_dateproc',       friendly:'Claim Processed Date',                                        required:false },
+  { claim:'cl_daterec',                 claimline:'ln_daterec',        friendly:'Claim Received Date',                                         required:false },
+  { claim:'cl_claimstatus',             claimline:'ln_claimstatus',    friendly:'Claim Status Code',                                           required:true  },
+  { claim:'cl_claimtype',               claimline:'',                  friendly:'Claim Type',                                                  required:true  },
+  { claim:'cl_sum_cob_allowed',         claimline:'',                  friendly:'COB Allowed Amount',                                          required:false },
+  { claim:'',                           claimline:'ln_cobadj',         friendly:'COB Amount',                                                  required:false },
+  { claim:'cl_cobind',                  claimline:'ln_cobind',         friendly:'COB Indicator',                                               required:false },
+  { claim:'',                           claimline:'ln_coinsurance',    friendly:'Coinsurance Amount',                                          required:true  },
+  { claim:'',                           claimline:'ln_copay',          friendly:'Copay Amount',                                                required:true  },
+  { claim:'cl_effective_date',          claimline:'ln_effective_date', friendly:'Coverage Effective Date',                                     required:false },
+  { claim:'cl_terminated_date',         claimline:'ln_terminated_date',friendly:'Coverage Termination Date',                                   required:false },
+  { claim:'',                           claimline:'ln_cpt',            friendly:'CPT / HCPCS Code (Professional)',                             required:true  },
+  { claim:'',                           claimline:'ln_hcpcs_code',     friendly:'CPT / HCPCS / HIPPS Code (Facility)',                         required:false },
+  { claim:'cl_ptdod',                   claimline:'',                  friendly:'Date of Death',                                               required:false },
+  { claim:'cl_date_of_onset',           claimline:'',                  friendly:'Date of Onset',                                               required:false },
+  { claim:'',                           claimline:'ln_deductible',     friendly:'Deductible Amount',                                           required:true  },
+  { claim:'',                           claimline:'ln_dx1',            friendly:'Diagnosis 1',                                                 required:true  },
+  { claim:'',                           claimline:'ln_dx2',            friendly:'Diagnosis 2',                                                 required:true  },
+  { claim:'',                           claimline:'ln_dx3',            friendly:'Diagnosis 3',                                                 required:true  },
+  { claim:'',                           claimline:'ln_dx4',            friendly:'Diagnosis 4',                                                 required:true  },
+  { claim:'',                           claimline:'ln_dx5',            friendly:'Diagnosis 5',                                                 required:false },
+  { claim:'',                           claimline:'ln_dx6',            friendly:'Diagnosis 6',                                                 required:false },
+  { claim:'',                           claimline:'ln_dx7',            friendly:'Diagnosis 7',                                                 required:false },
+  { claim:'',                           claimline:'ln_dx8',            friendly:'Diagnosis 8',                                                 required:false },
+  { claim:'',                           claimline:'ln_dx9',            friendly:'Diagnosis 9',                                                 required:false },
+  { claim:'',                           claimline:'ln_dx10',           friendly:'Diagnosis 10',                                                required:false },
+  { claim:'cl_dischargedate',           claimline:'ln_dischargedate',  friendly:'Discharge Date',                                              required:true  },
+  { claim:'cl_dischargehour',           claimline:'',                  friendly:'Discharge Hour',                                              required:false },
+  { claim:'cl_drg',                     claimline:'ln_drg',            friendly:'DRG Code',                                                    required:true  },
+  { claim:'cl_drgsoi',                  claimline:'',                  friendly:'DRG SOI',                                                     required:false },
+  { claim:'cl_drgversion',              claimline:'',                  friendly:'DRG Version',                                                 required:false },
+  { claim:'cl_eessn',                   claimline:'',                  friendly:'Employee / SSN',                                              required:false },
+  { claim:'cl_eeaddress',               claimline:'',                  friendly:'Employee / Subscriber Address',                               required:false },
+  { claim:'cl_eeaddress2',              claimline:'',                  friendly:'Employee / Subscriber Address 2',                             required:false },
+  { claim:'cl_eecity',                  claimline:'',                  friendly:'Employee / Subscriber City',                                  required:false },
+  { claim:'cl_eedob',                   claimline:'',                  friendly:'Employee / Subscriber Date of Birth',                         required:true  },
+  { claim:'cl_eefn',                    claimline:'',                  friendly:'Employee / Subscriber First Name',                            required:true  },
+  { claim:'cl_eesex',                   claimline:'',                  friendly:'Employee / Subscriber Gender',                                required:true  },
+  { claim:'cl_memid',                   claimline:'',                  friendly:'Employee / Subscriber ID',                                    required:true  },
+  { claim:'cl_eeln',                    claimline:'',                  friendly:'Employee / Subscriber Last Name',                             required:true  },
+  { claim:'cl_eestate',                 claimline:'',                  friendly:'Employee / Subscriber State',                                 required:false },
+  { claim:'cl_eezip',                   claimline:'',                  friendly:'Employee / Subscriber Zip Code',                              required:false },
+  { claim:'cl_ext_cause',               claimline:'',                  friendly:'External Cause of Injury Code',                               required:false },
+  { claim:'cl_fdos',                    claimline:'ln_fdos',           friendly:'From Date of Service (Professional)',                         required:true  },
+  { claim:'cl_eegroup',                 claimline:'',                  friendly:'Group Number',                                                required:false },
+  { claim:'cl_icd10_pc2',               claimline:'',                  friendly:'ICD-10-PCS Other Procedure 1 / Date',                        required:false },
+  { claim:'cl_icd10_pc3',               claimline:'',                  friendly:'ICD-10-PCS Other Procedure 2 / Date',                        required:false },
+  { claim:'cl_icd10_pc4',               claimline:'',                  friendly:'ICD-10-PCS Other Procedure 3 / Date',                        required:false },
+  { claim:'cl_icd10_pc5',               claimline:'',                  friendly:'ICD-10-PCS Other Procedure 4 / Date',                        required:false },
+  { claim:'cl_icd10_pc6',               claimline:'',                  friendly:'ICD-10-PCS Other Procedure 5 / Date',                        required:false },
+  { claim:'cl_icd10_pc',                claimline:'',                  friendly:'ICD-10-PCS-Principle Procedure / Date',                      required:false },
+  { claim:'cl_icn_number',              claimline:'',                  friendly:'ICN Number',                                                  required:false },
+  { claim:'cl_medical_record_number',   claimline:'',                  friendly:'Medical Record Number',                                       required:false },
+  { claim:'cl_medicareindicator',       claimline:'',                  friendly:'Medicare Indicator',                                          required:false },
+  { claim:'',                           claimline:'ln_mod1',           friendly:'Modifier 1',                                                  required:true  },
+  { claim:'',                           claimline:'ln_mod2',           friendly:'Modifier 2',                                                  required:true  },
+  { claim:'',                           claimline:'ln_mod3',           friendly:'Modifier 3',                                                  required:true  },
+  { claim:'',                           claimline:'ln_mod4',           friendly:'Modifier 4',                                                  required:true  },
+  { claim:'',                           claimline:'ln_ndc',            friendly:'NDC Number',                                                  required:false },
+  { claim:'',                           claimline:'ln_nc1_amt',        friendly:'Not Covered Amount (1) Not Covered',                          required:false },
+  { claim:'',                           claimline:'ln_nc2_amt',        friendly:'Not Covered Amount (2) Exclusion',                            required:false },
+  { claim:'',                           claimline:'ln_nc3_amt',        friendly:'Not Covered Amount (3) UCR',                                  required:false },
+  { claim:'',                           claimline:'ln_nc4_amt',        friendly:'Not Covered Amount (4) Plan',                                 required:false },
+  { claim:'',                           claimline:'ln_nc1_code',       friendly:'Not Covered Reason Code 1',                                   required:false },
+  { claim:'',                           claimline:'ln_nc2_code',       friendly:'Not Covered Reason Code 2',                                   required:false },
+  { claim:'',                           claimline:'ln_nc3_code',       friendly:'Not Covered Reason Code 3',                                   required:false },
+  { claim:'',                           claimline:'ln_nc4_code',       friendly:'Not Covered Reason Code 4',                                   required:false },
+  { claim:'cl_occurencecode',           claimline:'',                  friendly:'Occurrence Codes',                                            required:false },
+  { claim:'cl_occurrencedates',         claimline:'',                  friendly:'Occurrence Dates',                                            required:false },
+  { claim:'cl_occurrencespandates',     claimline:'',                  friendly:'Occurrence Span Dates',                                       required:false },
+  { claim:'cl_operating_physician_npi', claimline:'',                  friendly:'Operating Physician NPI',                                     required:false },
+  { claim:'cl_other_physicians',        claimline:'',                  friendly:'Other Provider Name and Identifiers- QUAL/NPI/QUAL/ID',       required:false },
+  { claim:'',                           claimline:'ln_paid',           friendly:'Paid Amount',                                                 required:true  },
+  { claim:'cl_ptaddress',               claimline:'',                  friendly:'Patient Address',                                             required:true  },
+  { claim:'cl_ptaddress2',              claimline:'',                  friendly:'Patient Address 2',                                           required:true  },
+  { claim:'cl_ptage',                   claimline:'',                  friendly:'Patient Age',                                                 required:false },
+  { claim:'cl_ptcity',                  claimline:'',                  friendly:'Patient City',                                                required:true  },
+  { claim:'cl_ptacctno',                claimline:'',                  friendly:'Patient Control/Patient Account Number',                      required:true  },
+  { claim:'cl_ptdischargestatus',       claimline:'',                  friendly:'Patient Discharge Status',                                    required:false },
+  { claim:'cl_ptdob',                   claimline:'',                  friendly:'Patient DOB',                                                 required:true  },
+  { claim:'cl_ptfn',                    claimline:'',                  friendly:'Patient First Name',                                          required:true  },
+  { claim:'cl_ptsex',                   claimline:'',                  friendly:'Patient Gender',                                              required:true  },
+  { claim:'cl_ptid',                    claimline:'ln_ptid',           friendly:'Patient ID',                                                  required:true  },
+  { claim:'cl_ptln',                    claimline:'',                  friendly:'Patient Last Name',                                           required:true  },
+  { claim:'cl_pt_reason_dx',            claimline:'',                  friendly:'Patient Reason for Visit Code',                               required:false },
+  { claim:'cl_ptrel',                   claimline:'',                  friendly:'Patient Relationship Code',                                   required:true  },
+  { claim:'cl_ptssn',                   claimline:'',                  friendly:'Patient SSN',                                                 required:false },
+  { claim:'cl_ptstate',                 claimline:'',                  friendly:'Patient State',                                               required:true  },
+  { claim:'cl_ptphone',                 claimline:'',                  friendly:'Patient Telephone Number',                                    required:false },
+  { claim:'cl_ptzip',                   claimline:'',                  friendly:'Patient Zip Code',                                            required:true  },
+  { claim:'cl_ptdepno',                 claimline:'',                  friendly:'Patient/Dependent Number',                                    required:false },
+  { claim:'cl_ptcond',                  claimline:'',                  friendly:"Patient's Condition / Status",                                required:false },
+  { claim:'cl_payee',                   claimline:'',                  friendly:'Payee',                                                       required:false },
+  { claim:'cl_pos',                     claimline:'ln_pos',            friendly:'Place of Service',                                            required:true  },
+  { claim:'cl_plan_id',                 claimline:'',                  friendly:'Plan ID',                                                     required:false },
+  { claim:'cl_plan',                    claimline:'',                  friendly:'Plan Number',                                                  required:false },
+  { claim:'cl_plan_suffix',             claimline:'',                  friendly:'Plan Number Suffix',                                          required:false },
+  { claim:'cl_poa_2',                   claimline:'',                  friendly:'POA Indicator 2',                                             required:false },
+  { claim:'cl_poa_3',                   claimline:'',                  friendly:'POA Indicator 3',                                             required:false },
+  { claim:'cl_poa_4',                   claimline:'',                  friendly:'POA Indicator 4',                                             required:false },
+  { claim:'cl_poa_5',                   claimline:'',                  friendly:'POA Indicator 5',                                             required:false },
+  { claim:'cl_poa_6',                   claimline:'',                  friendly:'POA Indicator 6',                                             required:false },
+  { claim:'cl_poa_principal',           claimline:'',                  friendly:'POA Indicator Principal',                                     required:false },
+  { claim:'cl_pre_authorization_codes', claimline:'',                  friendly:'Pre-Authorization/Prior Approval/Precertification',           required:false },
+  { claim:'cl_pricing_method',          claimline:'',                  friendly:'Pricing Method',                                              required:false },
+  { claim:'cl_refprvname',              claimline:'',                  friendly:'Referring Physician Name',                                    required:false },
+  { claim:'cl_refprv_npi',              claimline:'',                  friendly:'Referring Physician NPI',                                     required:false },
+  { claim:'cl_refprv_id',               claimline:'',                  friendly:'Referring Physician Other ID',                                required:false },
+  { claim:'cl_remarks',                 claimline:'',                  friendly:'Remarks',                                                     required:false },
+  { claim:'',                           claimline:'ln_revcode',        friendly:'Revenue Code',                                                required:true  },
+  { claim:'cl_prvgroupname',            claimline:'ln_prvgroupname',   friendly:'Service / Rendering Provider (Group) Name',                   required:true  },
+  { claim:'cl_prvaddress',              claimline:'',                  friendly:'Service / Rendering Provider Address',                        required:true  },
+  { claim:'cl_prvaddress2',             claimline:'',                  friendly:'Service / Rendering Provider Address 2',                      required:true  },
+  { claim:'cl_prvcity',                 claimline:'',                  friendly:'Service / Rendering Provider City',                           required:true  },
+  { claim:'cl_prvfax',                  claimline:'',                  friendly:'Service / Rendering Provider Fax',                            required:false },
+  { claim:'cl_prvtaxid_suf',            claimline:'',                  friendly:'Service / Rendering Provider Federal Tax ID suffix',           required:false },
+  { claim:'cl_prvfn',                   claimline:'',                  friendly:'Service / Rendering Provider First Name',                     required:false },
+  { claim:'cl_prvln',                   claimline:'',                  friendly:'Service / Rendering Provider Last Name',                      required:false },
+  { claim:'cl_prvnpi',                  claimline:'ln_prvnpi',         friendly:'Service / Rendering Provider National Provider Identifier',   required:true  },
+  { claim:'cl_network',                 claimline:'ln_network',        friendly:'Service / Rendering Provider Network Name',                   required:false },
+  { claim:'cl_network_ind',             claimline:'',                  friendly:'Service / Rendering Provider Network Status',                 required:true  },
+  { claim:'cl_prvphone',                claimline:'',                  friendly:'Service / Rendering Provider Phone',                          required:false },
+  { claim:'cl_prvspeccode',             claimline:'ln_prvspeccode',    friendly:'Service / Rendering Provider Specialty Code',                 required:false },
+  { claim:'cl_prvstate',                claimline:'',                  friendly:'Service / Rendering Provider State',                          required:true  },
+  { claim:'cl_prvtaxonomy',             claimline:'',                  friendly:'Service / Rendering Provider Taxonomy Code',                  required:false },
+  { claim:'cl_prvtype',                 claimline:'',                  friendly:'Service / Rendering Provider Type Code',                      required:false },
+  { claim:'cl_prvzip',                  claimline:'',                  friendly:'Service / Rendering Provider Zip',                            required:true  },
+  { claim:'cl_prvtaxid',                claimline:'ln_prvtaxid',       friendly:'Service Provider / Rendering Federal Tax ID Number',          required:false },
+  { claim:'cl_sourceofadmission',       claimline:'',                  friendly:'Source of Admission',                                         required:false },
+  { claim:'cl_statementfromdate',       claimline:'',                  friendly:'Statement Covers Period: From Date to (UB04)',                 required:false },
+  { claim:'cl_statementthroughdate',    claimline:'',                  friendly:'Statement Covers Period: Through Date to discharge (UB04)',    required:false },
+  { claim:'cl_tdos',                    claimline:'ln_tdos',           friendly:'To Date of Service (Professional)',                           required:true  },
+  { claim:'cl_authorization_codes',     claimline:'',                  friendly:'Treatment Authorization Codes',                               required:false },
+  { claim:'cl_typeofadmission',         claimline:'',                  friendly:'Type of Admission / Visit',                                   required:false },
+  { claim:'cl_tob',                     claimline:'ln_tob',            friendly:'Type of Bill',                                                required:true  },
+  { claim:'cl_type_of_coverage',        claimline:'',                  friendly:'Type of Coverage',                                            required:false },
+  { claim:'cl_typeofservice',           claimline:'ln_typeofservice',  friendly:'Type of Service',                                             required:false },
+  { claim:'',                           claimline:'ln_units',          friendly:'Units',                                                       required:true  },
+];
+
+// ============================================================
 // FIELD MAPPER TAB
 // ============================================================
 function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
@@ -1526,21 +1809,23 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
   const mappedSet    = useMemo(() => new Set(Object.values(fieldMappings).filter(Boolean)), [fieldMappings]);
   const mappedCount  = useMemo(() => Object.values(fieldMappings).filter(Boolean).length, [fieldMappings]);
 
+  const requiredSet = useMemo(() => new Set(FIELD_MAPPING_DATA.filter(r => r.required).map(r => r.friendly)), []);
+
   const filteredFields = useMemo(() => {
     let f = CI_FIELDS;
     if (search) { const s = search.toLowerCase(); f = f.filter(c => c.toLowerCase().includes(s)); }
     if (colFilter === 'mapped')   f = f.filter(c => fieldMappings[c]);
     if (colFilter === 'unmapped') f = f.filter(c => !fieldMappings[c]);
-    return f;
-  }, [search, colFilter, fieldMappings]);
+    if (colFilter === 'required') f = f.filter(c => requiredSet.has(c));
+    return [...f].sort((a, b) => a.localeCompare(b));
+  }, [search, colFilter, fieldMappings, requiredSet]);
 
   const visibleHeaders = useMemo(() => {
-    if (!search) return headers;
-    return headers; // always show all source cols
+    return [...headers].sort((a, b) => a.localeCompare(b));
   }, [headers]);
 
   const [valFilter, setValFilter] = useState('');
-  const [valSort,   setValSort]   = useState('count'); // 'count' | 'alpha'
+  const [valSort,   setValSort]   = useState('alpha'); // 'count' | 'alpha'
 
   // Unique values for the selected column
   const colStats = useMemo(() => {
@@ -1611,7 +1896,7 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
         <div className="mapper-source">
           <div className="mapper-source-header">
             <div className="panel-title">
-              Your Columns &nbsp;
+              Client Data Fields &nbsp;
               <span style={{fontWeight:400,color:'var(--text-light)'}}>{headers.length} total · {mappedSet.size} mapped</span>
             </div>
             <input className="explorer-col-search" placeholder="Filter columns…"
@@ -1621,7 +1906,7 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
             <span style={{fontSize:'0.65rem',color:'var(--text-light)',alignSelf:'center',marginRight:2}}>🟢 mapped &nbsp; ⚪ unmapped</span>
           </div>
           <div className="mapper-col-list">
-            {headers.map(col => (
+            {visibleHeaders.map(col => (
               <div
                 key={col}
                 draggable
@@ -1647,6 +1932,7 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
               value={search} onChange={e => setSearch(e.target.value)} />
             <select className="filter-select" value={colFilter} onChange={e => setColFilter(e.target.value)}>
               <option value="all">All fields</option>
+              <option value="required">Required only</option>
               <option value="mapped">Mapped only</option>
               <option value="unmapped">Unmapped only</option>
             </select>
@@ -1664,11 +1950,16 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
               </thead>
               <tbody>
                 {filteredFields.map(ci => {
-                  const mapped  = fieldMappings[ci] || '';
-                  const isOver  = dropTarget === ci;
-                  const isMapped = Boolean(mapped);
+                  const mapped     = fieldMappings[ci] || '';
+                  const isOver     = dropTarget === ci;
+                  const isMapped   = Boolean(mapped);
+                  const isRequired = requiredSet.has(ci);
+                  const rowBg      = isRequired
+                    ? (isMapped ? 'rgba(40,178,150,0.08)' : 'rgba(251,183,94,0.12)')
+                    : (isMapped ? 'rgba(40,178,150,0.04)' : '');
                   return (
                     <tr key={ci}
+                      style={{background: rowBg}}
                       className={`mapper-row ${isMapped ? 'mapped-row' : ''} ${isOver ? 'drop-target' : ''}`}
                       onDragOver={e => { e.preventDefault(); setDropTarget(ci); }}
                       onDragLeave={() => setDropTarget(null)}
@@ -1686,7 +1977,7 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
                             onChange={e => setFieldMappings(p => ({ ...p, [ci]: e.target.value }))}
                           >
                             <option value="">— not mapped —</option>
-                            {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                            {visibleHeaders.map(h => <option key={h} value={h}>{h}</option>)}
                           </select>
                           {isMapped && (
                             <button className="mapper-clear-btn"
@@ -1783,6 +2074,114 @@ function FieldMapper({ fileData, fieldMappings, setFieldMappings }) {
 }
 
 // ============================================================
+// MAPPED FIELDS TAB
+// ============================================================
+function MappedFields({ fieldMappings }) {
+  const [search,    setSearch]    = useState('');
+  const [showFilter, setFilter]   = useState('all'); // all | mapped | unmapped
+
+  const rows = useMemo(() => {
+    let r = FIELD_MAPPING_DATA;
+    if (showFilter === 'mapped')   r = r.filter(row => fieldMappings[row.friendly]);
+    if (showFilter === 'unmapped') r = r.filter(row => !fieldMappings[row.friendly]);
+    if (showFilter === 'required') r = r.filter(row => row.required);
+    if (search) {
+      const s = search.toLowerCase();
+      r = r.filter(row =>
+        row.friendly.toLowerCase().includes(s) ||
+        row.claim.toLowerCase().includes(s) ||
+        row.claimline.toLowerCase().includes(s) ||
+        (fieldMappings[row.friendly] || '').toLowerCase().includes(s)
+      );
+    }
+    return r;
+  }, [search, showFilter, fieldMappings]);
+
+  const mappedCount = useMemo(() => FIELD_MAPPING_DATA.filter(r => fieldMappings[r.friendly]).length, [fieldMappings]);
+
+  return (
+    <div>
+      {/* Stats + filter bar */}
+      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom:'0.85rem',flexWrap:'wrap'}}>
+        <div className="mapper-stats">
+          <span className="mapper-stat-pill total">{FIELD_MAPPING_DATA.length} CI Fields</span>
+          <span className="mapper-stat-pill done">{mappedCount} Client Mapped</span>
+          <span className="mapper-stat-pill pending">{FIELD_MAPPING_DATA.length - mappedCount} Unmapped</span>
+        </div>
+      </div>
+
+      <div className="filter-bar">
+        <input
+          className="search-input"
+          placeholder="Search friendly name, DB column, or client field…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <select className="filter-select" value={showFilter} onChange={e => setFilter(e.target.value)}>
+          <option value="all">All fields</option>
+          <option value="required">Required only</option>
+          <option value="mapped">Client mapped only</option>
+          <option value="unmapped">Unmapped only</option>
+        </select>
+        <span style={{fontSize:'0.72rem',color:'var(--text-muted)',marginLeft:'auto'}}>{rows.length} of {FIELD_MAPPING_DATA.length}</span>
+      </div>
+
+      <div className="card" style={{padding:0,overflow:'hidden'}}>
+        <table className="field-table">
+          <thead>
+            <tr>
+              <th style={{width:'20%'}}>Client Data Field</th>
+              <th style={{width:'19%'}}>claim_column_name</th>
+              <th style={{width:'19%'}}>claimline_column_name</th>
+              <th>Friendly Name</th>
+              <th style={{width:'90px',textAlign:'center'}}>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              const clientField = fieldMappings[row.friendly] || '';
+              const isMapped = Boolean(clientField);
+              const rowBg = row.required
+                ? (isMapped ? 'rgba(40,178,150,0.08)' : 'rgba(251,183,94,0.12)')
+                : (isMapped ? 'rgba(40,178,150,0.04)' : '');
+              return (
+                <tr key={i} style={{background: rowBg}}>
+                  <td>
+                    {isMapped
+                      ? <span style={{fontFamily:'var(--font-mono)',fontSize:'0.75rem',color:'var(--success)',fontWeight:600}}>{clientField}</span>
+                      : <span style={{fontSize:'0.72rem',color:'var(--text-light)',fontStyle:'italic'}}>—</span>
+                    }
+                  </td>
+                  <td>
+                    {row.claim
+                      ? <span className="mono" style={{color:'var(--text-main)'}}>{row.claim}</span>
+                      : <span style={{color:'var(--text-light)',fontSize:'0.72rem'}}>—</span>
+                    }
+                  </td>
+                  <td>
+                    {row.claimline
+                      ? <span className="mono" style={{color:'var(--text-main)'}}>{row.claimline}</span>
+                      : <span style={{color:'var(--text-light)',fontSize:'0.72rem'}}>—</span>
+                    }
+                  </td>
+                  <td style={{fontSize:'0.82rem',color:'var(--text-main)'}}>{row.friendly}</td>
+                  <td style={{textAlign:'center'}}>
+                    {row.required
+                      ? <span style={{fontSize:'0.65rem',fontWeight:700,color:'#92400e',background:'rgba(251,183,94,0.35)',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.03em'}}>Required</span>
+                      : <span style={{fontSize:'0.68rem',color:'var(--text-light)'}}>—</span>
+                    }
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // FIELD REFERENCE TAB
 // ============================================================
 function FieldReference() {
@@ -1817,28 +2216,35 @@ function FieldReference() {
         <span style={{fontSize:'0.75rem',color:'var(--text-muted)',marginLeft:'auto'}}>{filtered.length} of {FIELD_REFERENCE.length} fields</span>
       </div>
       <div className="card" style={{padding:0,overflow:'hidden'}}>
-        <table className="field-table">
+        <table className="field-table" style={{tableLayout:'fixed',width:'100%'}}>
           <thead>
             <tr>
-              <th style={{width:200}}>Extract Column</th>
-              <th style={{width:170}}>CI DB Field</th>
-              <th style={{width:110}}>Target Table</th>
+              <th>Extract Column</th>
+              <th>CI DB Field</th>
+              <th>Target Table</th>
               <th>EDI Source</th>
-              <th style={{width:190}}>Category</th>
+              <th>CMS 1500</th>
+              <th>UB04</th>
+              <th>Category</th>
             </tr>
           </thead>
           <tbody>
             {Object.entries(grouped).map(([cat, rows]) => [
-              <tr key={'cat-'+cat} className="cat-divider"><td colSpan={5}>{cat} ({rows.length})</td></tr>,
-              ...rows.map((f,i) => (
+              <tr key={'cat-'+cat} className="cat-divider"><td colSpan={7}>{cat} ({rows.length})</td></tr>,
+              ...rows.map((f,i) => {
+                const loc = FORM_LOCATORS[f.extract] || {};
+                return (
                 <tr key={cat+'-'+i}>
                   <td>{f.extract}</td>
                   <td><span className="mono">{f.db}</span></td>
                   <td><span className="badge badge-info" style={{fontSize:'0.65rem'}}>{f.table}</span></td>
                   <td style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--text-muted)'}}>{f.edi}</td>
+                  <td style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--text-muted)'}}>{loc.cms1500 || ''}</td>
+                  <td style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--text-muted)'}}>{loc.ub04 || ''}</td>
                   <td style={{fontSize:'0.72rem',color:'var(--text-muted)'}}>{f.cat}</td>
                 </tr>
-              ))
+                );
+              })
             ])}
           </tbody>
         </table>
@@ -1847,97 +2253,6 @@ function FieldReference() {
   );
 }
 
-// ============================================================
-// VALIDATION RULES TAB
-// ============================================================
-function ValidationRules() {
-  return (
-    <div>
-      <div style={{marginBottom:'0.75rem',fontSize:'0.82rem',color:'var(--text-muted)'}}>
-        10 Pre & Post Mapping Validation rules (MV-1 through MV-10) from CI_Calculations_v3_2.md Section 10.
-        These rules are implemented in the Pre & Post Mapping Validation Portal v2.0.
-      </div>
-
-      <div className="stats-row" style={{marginBottom:'1.25rem'}}>
-        <div className="stat-card">
-          <div className="stat-label">Total Rules</div>
-          <div className="stat-value">{MV_RULES.length}</div>
-          <div className="stat-sub">MV-1 through MV-10</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Rules with Thresholds</div>
-          <div className="stat-value">{MV_RULES.filter(r => r.thresholds).length}</div>
-          <div className="stat-sub">Pass / Warn / Fail defined</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Per-Field Rules</div>
-          <div className="stat-value">2</div>
-          <div className="stat-sub">MV-4 Pre-Mapping · MV-5 Post-Mapping</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Aggregate Rules</div>
-          <div className="stat-value">8</div>
-          <div className="stat-sub">Dataset-level validation scores</div>
-        </div>
-      </div>
-
-      <div className="mv-grid">
-        {MV_RULES.map(r => (
-          <div className="mv-card" key={r.id}>
-            <div className="mv-card-header">
-              <div>
-                <div className="mv-id">{r.id}</div>
-              </div>
-            </div>
-            <div className="mv-name">{r.name}</div>
-            <div className="mv-def">{r.definition}</div>
-            {r.thresholds && (
-              <div className="mv-thresholds">
-                {r.thresholds.map((t,i) => (
-                  <span key={i} className={`threshold-chip ${t.cls}`}>{t.label}</span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="card" style={{marginTop:'1rem'}}>
-        <div className="card-title">Composite Status Logic — MV-4 Pre-Mapping Validation</div>
-        <table className="metrics-table">
-          <thead><tr>
-            <th>Check</th><th>Pass</th><th>Warning</th><th>Fail</th>
-          </tr></thead>
-          <tbody>
-            <tr><td>Completeness (required field)</td><td>≥95% filled</td><td>50–95% filled</td><td>&lt;50% or required &lt;95%</td></tr>
-            <tr><td>Completeness (optional field)</td><td>≥99% filled</td><td>50–99% filled</td><td>&lt;50% filled</td></tr>
-            <tr><td>Type Match</td><td>Exact match</td><td>Mixed / Unknown source type</td><td>Type mismatch</td></tr>
-            <tr><td>Cardinality</td><td>&gt;1 distinct value</td><td>—</td><td>1 distinct value (constant)</td></tr>
-            <tr><td>Mapping Defined</td><td>CI mapping exists</td><td>—</td><td>No CI mapping</td></tr>
-          </tbody>
-        </table>
-        <div style={{marginTop:'0.75rem',fontSize:'0.78rem',color:'var(--text-muted)',padding:'0.6rem 0.85rem',background:'var(--warning-bg)',borderRadius:'var(--radius-sm)',borderLeft:'3px solid var(--warning)'}}>
-          <strong>Composite Rule:</strong> If any check = FAIL → composite status is <strong>FAIL</strong>. If any check = WARN → <strong>WARN</strong>. Otherwise → <strong>PASS</strong>.
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="card-title">Standard Ignore Flag Filters</div>
-        <p style={{fontSize:'0.82rem',color:'var(--text-muted)',marginBottom:'0.75rem'}}>All metrics must exclude records flagged for CI-internal ignore. Apply to every query.</p>
-        <div className="expand-grid">
-          <div className="expand-section">
-            <h4>SQL Pattern</h4>
-            <div className="code-block">{`AND COALESCE(cl.cl_ci_ignore, 0) = 0\nAND COALESCE(ln.ln_ci_ignore, 0) = 0`}</div>
-          </div>
-          <div className="expand-section">
-            <h4>DAX Pattern</h4>
-            <div className="code-block">{`CALCULATE(\n    [Measure],\n    Claim[cl_ci_ignore] = 0\n        || ISBLANK(Claim[cl_ci_ignore]),\n    Claimline[ln_ci_ignore] = 0\n        || ISBLANK(Claimline[ln_ci_ignore])\n)`}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ============================================================
 // CSV PARSER (handles quoted fields)
@@ -2047,17 +2362,20 @@ function App() {
   const [tab, setTab] = useState('overview');
 
   const EMPTY_FILE     = { headers: [], rows: [], fileName: '', delim: ',', fileNames: [] };
-  const EMPTY_MAPPINGS = Object.fromEntries(COMPUTABLE_METRICS.map(m => [m.id, '']));
+  const EMPTY_MAPPINGS    = Object.fromEntries(COMPUTABLE_METRICS.map(m => [m.id, '']));
+  const EMPTY_TC_MAPPINGS = Object.fromEntries(TARGET_COMPLETION_METRICS.map(m => [m.id, Object.fromEntries(m.cols.map(c => [c.key, '']))]));
   const EMPTY_FIELD_MAPPINGS = Object.fromEntries(CI_FIELDS.map(f => [f, '']));
 
   const [fileData,       setFileData]       = useState(EMPTY_FILE);
   const [metricMappings, setMetricMappings] = useState(EMPTY_MAPPINGS);
+  const [tcMappings,     setTcMappings]     = useState(EMPTY_TC_MAPPINGS);
   const [fieldMappings,  setFieldMappings]  = useState(EMPTY_FIELD_MAPPINGS);
 
   const handleLoad = useCallback((dataOrText, name, fileNames = []) => {
     if (!dataOrText) {
       setFileData(EMPTY_FILE);
       setMetricMappings(EMPTY_MAPPINGS);
+      setTcMappings(EMPTY_TC_MAPPINGS);
       return;
     }
     // Accept either pre-parsed { headers, rows, delim } or raw text string
@@ -2067,14 +2385,15 @@ function App() {
     if (!headers.length) return;
     setFileData({ headers, rows, fileName: name, delim, fileNames });
     setMetricMappings(EMPTY_MAPPINGS);
+    setTcMappings(EMPTY_TC_MAPPINGS);
   }, []);
 
   const TABS = [
     { key:'overview',    label:'Overview' },
     { key:'metrics',     label:'Metrics Catalog' },
     { key:'mapper',      label:'Field Mapper' },
+    { key:'mapped',      label:'Mapped Fields' },
     { key:'fields',      label:'Field Reference' },
-    { key:'validation',  label:'Validation Rules' },
   ];
 
   return (
@@ -2105,7 +2424,6 @@ function App() {
         <div className="client-header">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
           <span className="client-name">CI Calculations — Validation Portal</span>
-          <span className="client-sub">Standard Calculations Reference v3.2 · {METRICS.length} metrics · {FIELD_REFERENCE.length} fields · {MV_RULES.length} validation rules</span>
         </div>
 
         {/* SECTION BAR (mobile/alternative nav) */}
@@ -2117,10 +2435,10 @@ function App() {
         </div>
 
         {tab === 'overview'   && <Overview onNav={setTab} fileData={fileData} onLoad={handleLoad} />}
-        {tab === 'metrics'    && <MetricsCatalog fileData={fileData} metricMappings={metricMappings} setMetricMappings={setMetricMappings} />}
+        {tab === 'metrics'    && <MetricsCatalog fileData={fileData} metricMappings={metricMappings} setMetricMappings={setMetricMappings} tcMappings={tcMappings} setTcMappings={setTcMappings} />}
         {tab === 'mapper'     && <FieldMapper fileData={fileData} fieldMappings={fieldMappings} setFieldMappings={setFieldMappings} />}
+        {tab === 'mapped'     && <MappedFields fieldMappings={fieldMappings} />}
         {tab === 'fields'     && <FieldReference />}
-        {tab === 'validation' && <ValidationRules />}
 
         <div className="portal-footer">
           CI Calculations Validation Portal v1.0 &nbsp;·&nbsp; Source: CI_Calculations_v3_2.md · Pre_Post_Mapping_Validation_Documentation_v2_0.docx &nbsp;·&nbsp; 2026-03-16 &nbsp;·&nbsp; ClaimInformatics™

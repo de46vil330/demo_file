@@ -102,6 +102,99 @@ Extended file upload to accept `.txt` files in addition to `.csv` and `.tsv`. `d
 
 ---
 
+---
+
+_Session 2 — 2026-03-17_
+
+---
+
+## PR 8 — feat: Field Reference — CMS 1500 and UB04 columns
+
+**Summary**
+Added two new columns (CMS 1500 and UB04) to the Field Reference table. A new `FORM_LOCATORS` constant (~70 entries) maps each extract column name to its claim form block reference (e.g., `Block 24B`, `Block 67`). The table header `colSpan` was updated from 5 to 7, and `table-layout: fixed; width: 100%` was applied for even column distribution.
+
+**Files changed**
+- `CI_Calculations_Validation_Portal_v1_0.html` — `FORM_LOCATORS` constant, `FieldReference` table JSX
+
+**Type:** `feat`
+
+---
+
+## PR 9 — fix: Correct CI DB Field names on Field Reference page
+
+**Summary**
+All `db` values in `FIELD_REFERENCE` were using old/inconsistent naming. Cross-referenced against `FIELD_MAPPING_DATA` and corrected ~93 entries (e.g., `cl_claimid` → `cl_claim`, `ln_dateserv` → `ln_fdos`, `cl_diag1–10` → `ln_dx1–10`, all `prv_*` → `cl_prv*`/`ln_prv*`, etc.). Diagnosis fields also had their target table corrected from `claim` to `claimline`.
+
+**Files changed**
+- `CI_Calculations_Validation_Portal_v1_0.html` — `FIELD_REFERENCE` array (all `db` and affected `table` values)
+
+**Type:** `fix`
+
+---
+
+## PR 10 — chore: Remove header subtitle + enlarge Load Files button
+
+**Summary**
+Removed the subtitle string ("Standard Calculations Reference v3.2 · 35 metrics · 93 fields · 10 validation rules") that appeared after "Validation Portal" in the app header. Also increased the size of the Load Files button on the pre-load Overview page (`font-size: 1rem`, `padding: 0.6rem 1.4rem`, `font-weight: 700`) and removed the "No file loaded" text that sat alongside it.
+
+**Files changed**
+- `CI_Calculations_Validation_Portal_v1_0.html` — app header JSX, Overview pre-load button
+
+**Type:** `chore + UI`
+
+---
+
+## PR 11 — feat: Target Completion Percentage section on Metrics Catalog
+
+**Summary**
+Added a new `TargetCompletion` component below the Live Metrics section on the Metrics Catalog page. Contains 4 metric cards (TC-1 through TC-5, TC-4 removed per request): Place of Service, CPT/HCPCS (Professional), Revenue Code, and Type of Bill. Each card has multi-column selectors and computes either a subtract formula (`Count(A) − Count(B)`) or a single-column count. Results display as **Actual count** and **Target count** (plain numbers — no percentage, no progress bar).
+
+**Key implementation details**
+- `TARGET_COMPLETION_METRICS` constant defines each metric's formula type (`subtract` or `single`) and column selector keys
+- `countFilled(rows, col)` helper counts non-empty rows for a given column
+- `EMPTY_TC_MAPPINGS` initializes all selectors to empty string; reset on file load/clear
+- `tcMappings` / `setTcMappings` state added to `App`, passed through `MetricsCatalog`
+
+**Files changed**
+- `CI_Calculations_Validation_Portal_v1_0.html` — `TARGET_COMPLETION_METRICS`, `countFilled`, `TargetCompletion` component, `EMPTY_TC_MAPPINGS`, `App` state, `MetricsCatalog`
+
+**Type:** `feat`
+
+---
+
+## PR 12 — feat: Required field highlighting on Mapped Fields and Field Mapper
+
+**Summary**
+Added `required: true/false` to all ~160 entries in `FIELD_MAPPING_DATA` (57 fields marked required). Applied color-coded row backgrounds across both the Mapped Fields and Field Mapper tabs:
+
+| State | Background |
+|-------|-----------|
+| Required + mapped | `rgba(40,178,150,0.08)` (green) |
+| Required + unmapped | `rgba(251,183,94,0.12)` (amber) |
+| Optional + mapped | `rgba(40,178,150,0.04)` (light green) |
+| Optional + unmapped | none |
+
+Mapped Fields also gained a **Required** column with a styled badge and a "Required only" filter toggle. Field Mapper uses a `requiredSet` useMemo (Set of friendly names) for O(1) lookup without extra props.
+
+**Files changed**
+- `CI_Calculations_Validation_Portal_v1_0.html` — `FIELD_MAPPING_DATA` (all entries), `MappedFields` component, `FieldMapper` component
+
+**Type:** `feat`
+
+---
+
+## PR 13 — fix: Black text on highlighted rows in Mapped Fields
+
+**Summary**
+The `claim` and `claimline` mono-spaced text in the Mapped Fields table was rendering in orange (`var(--accent-dark)`), which was hard to read against the amber required-row background. Changed both spans to `color: var(--text-main)` for legibility.
+
+**Files changed**
+- `CI_Calculations_Validation_Portal_v1_0.html` — `MappedFields` row render, claim/claimline `<span>` color style
+
+**Type:** `fix`
+
+---
+
 ## Notes
 - All changes are in a single HTML file (no build step — React via Babel standalone)
 - Repo does not yet exist on GitHub; these PRs are staged for when a repo is created under ClaimInformatics

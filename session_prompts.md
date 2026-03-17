@@ -52,3 +52,49 @@ _Conversation log of all user prompts in this thread_
 24. run it for me
 
 25. backup all the prompts in this thread into a .md
+
+---
+
+_Session continued — 2026-03-17_
+
+26. _(attached mapping doc + screenshots)_ Can we create another tab named 'Mapped Fields', next to 'Field Mapper'. Can we also rename 'Your Columns' to 'Client Data Fields'
+
+27. Can we have the client data fields on the 'Field Mapper' page listed in alphabetical order? also do the same with the unique values on the right side of the same page. It currently defaults to count but I want it to be A-Z
+
+28. _(screenshot showing still not alphabetical)_ still not, it is just placing them in the original file order, but it is easier to map when it is alphabetical
+
+29. can the pop-up in client field also be done alphabetically to match
+
+30. On the Metrics Catalog page, the following should be Unique Count if it isn't already: CM-1, CM-2, CM-3. CM-6 and CM-7 do not need to try to automatically choose the field.
+
+31. Please remove the Numeric Column Totals visual on the Overview page
+
+32. Please remove the Validation Rules tab
+
+33. Can the Column Completeness be ordered by Completeness first and secondarily alphabetically
+
+34. I would like the items with the lowest completeness on top
+
+35. _(screenshot of Overview bottom)_ This can all be removed from the bottom of the Overview page
+
+36. _(screenshot of blank Overview)_ Can we adjust the pre data load page to just look like a blank version of what the page looks like once the data is loaded?
+
+37. _(attached ClaimInformatics Record Layout - Claude.txt)_ On the Field Reference Page, I would like to create two new columns next to 'EDI Source', CMS 1500 and UB04. In the attached document, please match Field Name with Extract Column and then use 'Claim Form Locator' to populate the appropriate column
+
+38. _(screenshot of Mapped Fields tab)_ on that same page, can you make the 'CI DB Field' match this format and correct the field names as they are not currently correct on the Field Reference page. Can you also distribute the columns evenly
+
+39. _(screenshot of header)_ Please remove everything after Validation Portal and can we make the Load Files button larger on the initial page
+
+40. _(attached Target Completion Percentage.txt)_ On the Metrics Catalog I want to create another section titled "Target Completion Percentage". I would like it to be like the field above where I can choose the fields that would create the embedded calculation
+
+41. _(screenshot)_ Please remove this one _(TC-4 CPT / HCPCS / HIPPS Code (Facility))_
+
+42. _(attached Mapping Fields for Claude.txt)_ Please add a column on the Mapped Fields page with the additional column named Required and place corresponding result next to the friendly name. Is there a way to highlight these rows so they are more easily visible
+
+43. Can you recreate the same color scheme on Field Mapper tab? It does not need to have the Required column added
+
+44. _(screenshot of Mapped Fields)_ can we make this text black because it is a little hard to read with the highlighted rows
+
+45. The formulas in Target Completion Percentage should result in a Count not a percentage. It is counting the items in the column as described in the formula
+
+46. backup all the prompts in this thread into a .md
